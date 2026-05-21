@@ -1,20 +1,26 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import SmoothScroll from "@/components/SmoothScroll";
+import PageVeil from "@/components/PageVeil";
+import CursorGlow from "@/components/CursorGlow";
 
 export const metadata: Metadata = {
-  title: "Sheenhaus — We make premium brands look premium online",
-  description: "Sheenhaus transforms premium brands' digital presence. Hand-coded websites, AI discoverability, 3-week delivery. Serving clients across US, UAE, Europe & India.",
+  title: "Sheenhaus — A digital studio for premium brands",
+  description:
+    "Sheenhaus is a boutique studio crafting digital presence for premium brands. Hand-coded, art-directed, AI-discoverable. Now booking Q3 2026 — serving Mumbai, Dubai, New York, London.",
   openGraph: {
-    title: "Sheenhaus — We make premium brands look premium online",
-    description: "We transform premium brands' digital presence. Hand-coded websites, AI discoverability, 3-week delivery.",
+    title: "Sheenhaus — A digital studio for premium brands",
+    description:
+      "A boutique studio crafting digital presence for premium brands. Hand-coded, art-directed, AI-discoverable.",
     url: "https://sheenhaus.com",
     siteName: "Sheenhaus",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Sheenhaus — Premium Digital Presence",
-    description: "We make premium brands look premium online.",
+    title: "Sheenhaus — A digital studio for premium brands",
+    description:
+      "A boutique studio crafting digital presence for premium brands.",
   },
 };
 
@@ -22,8 +28,13 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className="scroll-smooth">
-      <body className="overflow-x-hidden">{children}</body>
+    <html lang="en">
+      <body className="overflow-x-hidden">
+        <PageVeil />
+        <SmoothScroll />
+        <CursorGlow />
+        <div className="page-rise">{children}</div>
+      </body>
     </html>
   );
 }

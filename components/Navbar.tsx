@@ -5,9 +5,8 @@ import Link from "next/link";
 
 const NAV_LINKS = [
   { href: "#work", label: "Work" },
-  { href: "#services", label: "Services" },
-  { href: "#process", label: "Process" },
-  { href: "#faq", label: "FAQ" },
+  { href: "#studio", label: "Studio" },
+  { href: "#contact", label: "Contact" },
 ];
 
 const CAL_LINK = "https://cal.com/sheenhaus/intro";
@@ -17,52 +16,69 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener("scroll", handleScroll);
+    const handleScroll = () => setScrolled(window.scrollY > 40);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
     <>
       <motion.nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ${
           scrolled
-            ? "bg-bg/80 backdrop-blur-xl border-b border-border"
-            : "bg-transparent"
+            ? "bg-bg/75 backdrop-blur-xl border-b border-border"
+            : "bg-transparent border-b border-transparent"
         }`}
         initial={{ y: -100 }}
         animate={{ y: 0 }}
-        transition={{ duration: 0.6, ease: [0.25, 0.4, 0.25, 1] }}
+        transition={{ duration: 1.0, delay: 0.6, ease: [0.2, 0.7, 0.2, 1] }}
       >
-        <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between h-20">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 bg-accent rounded-[10px] flex items-center justify-center font-serif text-xl text-bg transition-transform duration-300 group-hover:rotate-[-5deg] group-hover:scale-105">
-              S
-            </div>
-            <span className="font-serif text-[22px] tracking-tight text-text">
+        <div className="shell flex items-center justify-between h-[88px]">
+          {/* Logomark + wordmark — placeholder until real logo lands */}
+          <Link
+            href="/"
+            className="flex items-center gap-3 group"
+            data-cursor="hover"
+          >
+            <span className="relative w-9 h-9 inline-flex items-center justify-center">
+              <span className="absolute inset-0 rounded-full border border-accent/50" />
+              <span className="absolute inset-[5px] rounded-full border border-accent/25" />
+              <span className="font-serif italic text-accent text-base leading-none">
+                S
+              </span>
+            </span>
+            <span className="font-serif text-[22px] tracking-tight text-text leading-none">
               Sheenhaus
             </span>
           </Link>
 
           {/* Desktop links */}
-          <div className="hidden md:flex items-center gap-10">
+          <div className="hidden md:flex items-center gap-12">
             {NAV_LINKS.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
-                className="text-sm text-text-mid hover:text-text transition-colors duration-300"
+                data-cursor="hover"
+                className="font-mono text-[11px] uppercase tracking-[0.22em] text-text-mid hover:text-text transition-colors duration-500"
               >
                 {link.label}
               </a>
             ))}
+            <div className="hidden lg:flex items-center gap-3 pl-6 border-l border-border">
+              <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse-slow" />
+              <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-text-dim">
+                Booking Q3
+              </span>
+            </div>
             <a
               href={CAL_LINK}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-accent text-bg px-6 py-2.5 rounded-lg text-sm font-semibold hover:opacity-90 hover:-translate-y-0.5 transition-all duration-300"
+              data-cursor="cta"
+              data-cursor-text="Book"
+              className="font-mono text-[11px] uppercase tracking-[0.22em] text-accent hover:text-accent-bright transition-colors duration-500"
             >
-              Book a Call
+              Book a call →
             </a>
           </div>
 
@@ -71,42 +87,42 @@ export default function Navbar() {
             className="md:hidden flex flex-col gap-1.5 p-2"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Toggle menu"
+            data-cursor="hover"
           >
             <motion.span
-              className="w-6 h-0.5 bg-text block"
+              className="w-6 h-px bg-text block"
               animate={mobileOpen ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
             />
             <motion.span
-              className="w-6 h-0.5 bg-text block"
+              className="w-6 h-px bg-text block"
               animate={mobileOpen ? { opacity: 0 } : { opacity: 1 }}
             />
             <motion.span
-              className="w-6 h-0.5 bg-text block"
+              className="w-6 h-px bg-text block"
               animate={mobileOpen ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }}
             />
           </button>
         </div>
       </motion.nav>
 
-      {/* Mobile menu */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
-            className="fixed inset-0 z-40 bg-bg/95 backdrop-blur-xl pt-24 px-8"
+            className="fixed inset-0 z-40 bg-bg/97 backdrop-blur-xl pt-28 px-8"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.4 }}
           >
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-8">
               {NAV_LINKS.map((link, i) => (
                 <motion.a
                   key={link.href}
                   href={link.href}
-                  className="text-2xl font-serif text-text"
+                  className="font-serif text-4xl text-text"
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.1 }}
+                  transition={{ delay: i * 0.08 + 0.1 }}
                   onClick={() => setMobileOpen(false)}
                 >
                   {link.label}
@@ -116,10 +132,10 @@ export default function Navbar() {
                 href={CAL_LINK}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-accent text-bg px-8 py-4 rounded-xl text-center text-lg font-semibold mt-4"
+                className="btn-bronze mt-6 self-start"
                 onClick={() => setMobileOpen(false)}
               >
-                Book a Call
+                Book a call
               </a>
             </div>
           </motion.div>

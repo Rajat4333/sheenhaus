@@ -1,5 +1,5 @@
 "use client";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 
 export default function RevealOnScroll({
@@ -14,7 +14,15 @@ export default function RevealOnScroll({
   direction?: "up" | "left" | "right" | "none";
 }) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-60px" });
+  const isInView = useInView(ref, { once: true, amount: 0.01 });
+  const [fallback, setFallback] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setFallback(true), 600);
+    return () => clearTimeout(t);
+  }, []);
+
+  const show = isInView || fallback;
 
   const variants = {
     hidden: {
@@ -34,7 +42,7 @@ export default function RevealOnScroll({
       ref={ref}
       className={className}
       initial="hidden"
-      animate={isInView ? "visible" : "hidden"}
+      animate={show ? "visible" : "hidden"}
       variants={variants}
       transition={{
         duration: 0.7,
