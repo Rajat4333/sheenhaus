@@ -206,17 +206,16 @@ export default function Home() {
         </motion.div>
 
         <motion.h1
-          className="font-serif text-[clamp(3.5rem,11vw,11rem)] leading-[0.95] tracking-[-0.04em] mt-10 max-w-[18ch]"
+          className="font-serif text-[clamp(3.5rem,11vw,11rem)] leading-[1.0] tracking-[-0.04em] mt-10 max-w-[18ch] pb-2"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.4, delay: 1.0, ease: [0.2, 0.7, 0.2, 1] }}
         >
-          We craft the digital
+          We craft the
           <br />
-          presence of{" "}
-          <em className="italic-accent gradient-text">premium</em>
+          digital presence of
           <br />
-          brands.
+          <em className="italic-accent gradient-text">premium</em> brands.
         </motion.h1>
 
         <motion.div
@@ -610,7 +609,7 @@ export default function Home() {
       <footer className="relative z-10 mt-20 border-t border-border">
         <div className="shell py-16">
           {/* Massive wordmark */}
-          <div className="font-serif text-[clamp(4rem,18vw,18rem)] leading-[0.9] tracking-[-0.05em] text-text overflow-hidden">
+          <div className="font-serif text-[clamp(4rem,18vw,18rem)] leading-[1.0] tracking-[-0.05em] text-text pb-4">
             Sheen<em className="italic-accent gradient-text">haus</em>
           </div>
 
