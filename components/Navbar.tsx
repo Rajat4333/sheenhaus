@@ -25,31 +25,20 @@ export default function Navbar() {
     <>
       <motion.nav
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ${
-          scrolled
-            ? "bg-bg/75 backdrop-blur-xl border-b border-border"
-            : "bg-transparent border-b border-transparent"
+          scrolled ? "bg-bg/70 backdrop-blur-xl" : "bg-transparent"
         }`}
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 1.0, delay: 0.6, ease: [0.2, 0.7, 0.2, 1] }}
       >
         <div className="shell flex items-center justify-between h-[88px]">
-          {/* Logomark + wordmark — placeholder until real logo lands */}
+          {/* Wordmark only */}
           <Link
             href="/"
-            className="flex items-center gap-3 group"
+            className="font-serif text-[26px] tracking-[-0.02em] text-text leading-none"
             data-cursor="hover"
           >
-            <span className="relative w-9 h-9 inline-flex items-center justify-center">
-              <span className="absolute inset-0 rounded-full border border-accent/50" />
-              <span className="absolute inset-[5px] rounded-full border border-accent/25" />
-              <span className="font-serif italic text-accent text-base leading-none">
-                S
-              </span>
-            </span>
-            <span className="font-serif text-[22px] tracking-tight text-text leading-none">
-              Sheenhaus
-            </span>
+            Sheenhaus
           </Link>
 
           {/* Desktop links */}
@@ -64,21 +53,18 @@ export default function Navbar() {
                 {link.label}
               </a>
             ))}
-            <div className="hidden lg:flex items-center gap-3 pl-6 border-l border-border">
-              <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse-slow" />
-              <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-text-dim">
-                Booking Q3
-              </span>
-            </div>
+            <span className="hidden lg:inline-block font-mono text-[10px] uppercase tracking-[0.22em] text-text-faint pl-6 border-l border-border">
+              Accepting briefs
+            </span>
             <a
               href={CAL_LINK}
               target="_blank"
               rel="noopener noreferrer"
               data-cursor="cta"
-              data-cursor-text="Book"
-              className="font-mono text-[11px] uppercase tracking-[0.22em] text-accent hover:text-accent-bright transition-colors duration-500"
+              data-cursor-text="Schedule"
+              className="font-mono text-[11px] uppercase tracking-[0.22em] text-text hover:text-accent transition-colors duration-500"
             >
-              Book a call →
+              Reserve <span aria-hidden>→</span>
             </a>
           </div>
 
@@ -135,7 +121,7 @@ export default function Navbar() {
                 className="btn-bronze mt-6 self-start"
                 onClick={() => setMobileOpen(false)}
               >
-                Book a call
+                Reserve
               </a>
             </div>
           </motion.div>

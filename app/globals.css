@@ -4,30 +4,24 @@
 @import "tailwindcss";
 
 @theme {
-  /* ── Warm palette ────────────────────────────────────────── */
-  --color-bg: #0e0d0b;
-  --color-bg-surface: #16140f;
-  --color-bg-surface-2: #1d1a14;
-  --color-bg-surface-3: #24201a;
+  /* ── Warm cream / light palette ──────────────────────────── */
+  --color-bg: #f4efe6;
+  --color-bg-surface: #ece6da;
+  --color-bg-surface-2: #e2dccf;
 
-  --color-border: #2a2620;
-  --color-border-quiet: #1d1a14;
-  --color-border-light: #3a342b;
+  --color-border: #d3cbb8;
+  --color-border-light: #b8ad95;
 
-  --color-accent: #c9a96e;
-  --color-accent-bright: #d9bd86;
-  --color-accent-warm: #b8956a;
-  --color-accent-dim: rgba(201, 169, 110, 0.08);
-  --color-accent-mid: rgba(201, 169, 110, 0.18);
-  --color-accent-glow: rgba(201, 169, 110, 0.04);
+  --color-accent: #8a6a35;
+  --color-accent-bright: #a07e44;
+  --color-accent-warm: #75582b;
+  --color-accent-dim: rgba(138, 106, 53, 0.06);
+  --color-accent-mid: rgba(138, 106, 53, 0.16);
 
-  --color-forest: #2d4a3a;
-  --color-forest-mid: rgba(45, 74, 58, 0.4);
-
-  --color-text: #f0ebe0;
-  --color-text-mid: #a39a8a;
-  --color-text-dim: #6b6357;
-  --color-text-faint: #4a4339;
+  --color-text: #1a1612;
+  --color-text-mid: #4a4233;        /* body copy */
+  --color-text-dim: #6a5e48;        /* AA-compliant on cream */
+  --color-text-faint: #8a7d68;      /* tiny meta */
 
   /* ── Type ────────────────────────────────────────────────── */
   --font-serif: 'Instrument Serif', 'Times New Roman', Georgia, serif;
@@ -36,9 +30,6 @@
 
   /* ── Motion ──────────────────────────────────────────────── */
   --animate-pulse-slow: pulse-slow 3.5s ease-in-out infinite;
-  --animate-marquee: marquee 60s linear infinite;
-  --animate-veil-out: veil-out 1.4s cubic-bezier(0.7, 0, 0.2, 1) forwards;
-  --animate-page-rise: page-rise 1.4s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
 
   @keyframes pulse-slow {
     0%, 100% { opacity: 1; }
@@ -84,19 +75,19 @@ textarea {
 }
 
 ::selection {
-  background: rgba(201, 169, 110, 0.85);
-  color: #0e0d0b;
+  background: rgba(138, 106, 53, 0.85);
+  color: #f4efe6;
 }
 
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 96px;
-  background: #0e0d0b;
+  background: #f4efe6;
 }
 
 body {
-  background: #0e0d0b;
-  color: #f0ebe0;
+  background: #f4efe6;
+  color: #1a1612;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-family: 'Satoshi', system-ui, sans-serif;
@@ -121,33 +112,68 @@ body::after {
   content: '';
   position: fixed;
   inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
   pointer-events: none;
   z-index: 9999;
-  mix-blend-mode: overlay;
+  mix-blend-mode: multiply;
+  opacity: 0.5;
 }
 
 /* ── Scrollbar ──────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: #0e0d0b; }
+::-webkit-scrollbar-track { background: #f4efe6; }
 ::-webkit-scrollbar-thumb {
-  background: #2a2620;
+  background: #d3cbb8;
   border-radius: 4px;
-  border: 2px solid #0e0d0b;
+  border: 2px solid #f4efe6;
 }
-::-webkit-scrollbar-thumb:hover { background: #3a342b; }
+::-webkit-scrollbar-thumb:hover { background: #b8ad95; }
 
 /* ───────────────────────────────────────────────────────────── */
 /* Reusable utility classes                                      */
 /* ───────────────────────────────────────────────────────────── */
 
-/* Gradient text — bronze */
+/* Gradient text — bronze (static) */
 .gradient-text {
-  background: linear-gradient(135deg, #c9a96e 0%, #d9bd86 50%, #b8956a 100%);
+  background: linear-gradient(135deg, #8a6a35 0%, #a07e44 50%, #75582b 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   color: transparent;
+}
+
+/* Shimmer — slow bronze light catching across the word.
+   Used on the hero's italic emphasis word. Highlight drifts left to right
+   every 7s. Brighter cream stop in the middle of the gradient is the
+   "light catching gold" moment. */
+.shine {
+  background: linear-gradient(
+    100deg,
+    #75582b 0%,
+    #8a6a35 28%,
+    #c9a16a 48%,
+    #e8d4a4 50%,
+    #c9a16a 52%,
+    #8a6a35 72%,
+    #75582b 100%
+  );
+  background-size: 280% 100%;
+  background-position: 100% 50%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+  animation: shine-drift 7s ease-in-out infinite;
+}
+
+@keyframes shine-drift {
+  0%   { background-position: 100% 50%; }
+  50%  { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shine { animation: none; }
 }
 
 /* Italic accent */
@@ -160,25 +186,6 @@ body::after {
   padding-right: 0.06em;
   /* Allow descenders to render without being clipped by tight leading */
   padding-bottom: 0.04em;
-}
-
-/* Section eyebrow with numeral */
-.section-eyebrow {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 14px;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 11px;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--color-text-dim);
-}
-.section-eyebrow .num {
-  color: var(--color-accent);
-  letter-spacing: 0.1em;
-}
-.section-eyebrow .label {
-  color: var(--color-text-mid);
 }
 
 /* Hairline divider */
@@ -199,7 +206,7 @@ body::after {
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, #c9a96e, transparent);
+  background: linear-gradient(90deg, transparent, #8a6a35, transparent);
   opacity: 0;
   transition: opacity 0.7s ease;
 }
@@ -214,20 +221,54 @@ body::after {
 }
 .marquee-track:hover { animation-play-state: paused; }
 
-/* ── Page-load veil ────────────────────────────────────────── */
+/* ── Page-load veil + wordmark intro ───────────────────────── */
 .page-veil {
   position: fixed;
   inset: 0;
-  background: #0e0d0b;
+  background: #f4efe6;
   z-index: 100;
   pointer-events: none;
-  animation: veil-out 1.4s cubic-bezier(0.7, 0, 0.2, 1) forwards;
-  animation-delay: 0.2s;
+  /* Veil lifts only after the wordmark has had its moment.
+     wordmark fade-in (0.9s) + hold (0.3s) + wordmark out (0.6s) = ~1.8s */
+  animation: veil-out 0.9s cubic-bezier(0.7, 0, 0.2, 1) forwards;
+  animation-delay: 1.8s;
 }
+
+.page-veil-mark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /* Quiet, subtle wordmark — small, muted color, no gradient */
+  font-size: clamp(1.5rem, 2.2vw, 2rem);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--color-text-mid);
+  opacity: 0;
+  transform: translate(-50%, -50%);
+  animation:
+    veil-mark-in   0.9s cubic-bezier(0.2, 0.7, 0.2, 1) forwards,
+    veil-mark-out  0.6s cubic-bezier(0.7, 0, 0.2, 1) forwards;
+  animation-delay: 0.2s, 1.4s;
+}
+.page-veil-mark em {
+  font-style: italic;
+  color: var(--color-accent);
+}
+
+@keyframes veil-mark-in {
+  0%   { opacity: 0; transform: translate(-50%, calc(-50% + 6px)); }
+  100% { opacity: 1; transform: translate(-50%, -50%); }
+}
+@keyframes veil-mark-out {
+  0%   { opacity: 1; transform: translate(-50%, -50%); }
+  100% { opacity: 0; transform: translate(-50%, calc(-50% - 8px)); }
+}
+
 .page-rise {
   opacity: 0;
   animation: page-rise 1.4s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
-  animation-delay: 0.5s;
+  /* Content begins rising as the veil lifts (parallel reveal) */
+  animation-delay: 2.0s;
 }
 
 /* ── Custom cursor ─────────────────────────────────────────── */
@@ -237,7 +278,7 @@ body::after {
   top: 0; left: 0;
   width: 8px; height: 8px;
   border-radius: 50%;
-  background: #c9a96e;
+  background: #8a6a35;
   transform: translate3d(-50%, -50%, 0);
   z-index: 9998;
   mix-blend-mode: difference;
@@ -252,7 +293,7 @@ body::after {
   top: 0; left: 0;
   width: 36px; height: 36px;
   border-radius: 50%;
-  border: 1px solid rgba(201, 169, 110, 0.7);
+  border: 1px solid rgba(138, 106, 53, 0.7);
   transform: translate3d(-50%, -50%, 0);
   z-index: 9997;
   transition: width 0.4s cubic-bezier(0.2, 0.7, 0.2, 1),
@@ -263,7 +304,7 @@ body::after {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #0e0d0b;
+  color: #f4efe6;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 10px;
   font-weight: 500;
@@ -273,13 +314,13 @@ body::after {
 }
 .cursor-ring[data-state="hover"] {
   width: 56px; height: 56px;
-  background: rgba(201, 169, 110, 0.12);
-  border-color: rgba(201, 169, 110, 0.9);
+  background: rgba(138, 106, 53, 0.12);
+  border-color: rgba(138, 106, 53, 0.9);
 }
 .cursor-ring[data-state="cta"] {
   width: 88px; height: 88px;
-  background: #c9a96e;
-  border-color: #c9a96e;
+  background: #8a6a35;
+  border-color: #8a6a35;
 }
 .cursor-dot[data-state="cta"],
 .cursor-dot[data-state="hover"] { opacity: 0; }
@@ -295,7 +336,7 @@ body::after {
   width: 520px;
   height: 520px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(201, 169, 110, 0.05) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(138, 106, 53, 0.05) 0%, transparent 70%);
   transform: translate(-50%, -50%);
   z-index: 0;
   transition: transform 0.18s ease-out;
@@ -312,7 +353,7 @@ body::after {
   transition: padding-left 0.6s cubic-bezier(0.2, 0.7, 0.2, 1),
               background 0.6s ease;
 }
-.work-row:hover { padding-left: 24px; background: rgba(201, 169, 110, 0.025); }
+.work-row:hover { padding-left: 24px; background: rgba(138, 106, 53, 0.025); }
 .work-row:last-child { border-bottom: 1px solid var(--color-border); }
 @media (max-width: 768px) {
   .work-row {
@@ -340,8 +381,8 @@ body::after {
   transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
   z-index: 60;
   box-shadow: 0 30px 80px rgba(0,0,0,0.6);
-  border: 1px solid rgba(201, 169, 110, 0.25);
-  background: #16140f;
+  border: 1px solid rgba(138, 106, 53, 0.25);
+  background: #ece6da;
 }
 .work-preview[data-show="true"] {
   opacity: 1;
@@ -364,38 +405,44 @@ body::after {
 }
 
 /* ── Buttons ───────────────────────────────────────────────── */
+/* Primary CTA — near-black on cream, the authoritative action.
+   Aesop / Loro Piana / Aman pattern. Accent bronze is decoration,
+   not the call to act. */
 .btn-bronze {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 14px;
-  padding: 18px 32px;
-  background: #c9a96e;
-  color: #0e0d0b;
+  gap: 16px;
+  padding: 20px 36px;
+  background: var(--color-text);          /* near-black */
+  color: var(--color-bg);                  /* cream */
   border-radius: 999px;
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   transition: background 0.5s ease, transform 0.5s ease, box-shadow 0.5s ease;
 }
 .btn-bronze:hover {
-  background: #d9bd86;
+  background: var(--color-accent-warm);    /* deeper bronze on hover */
+  color: var(--color-bg);
   transform: translateY(-1px);
-  box-shadow: 0 18px 40px rgba(201, 169, 110, 0.18);
+  box-shadow: 0 18px 40px rgba(26, 22, 18, 0.16);
 }
+
+/* Secondary CTA — ghost with bronze accent on hover */
 .btn-ghost {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 14px;
-  padding: 17px 30px;
-  border: 1px solid var(--color-border-light);
+  gap: 16px;
+  padding: 19px 34px;
+  border: 1px solid var(--color-text-mid);
   color: var(--color-text);
   border-radius: 999px;
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 500;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   transition: border-color 0.6s ease, color 0.6s ease, background 0.6s ease;
 }

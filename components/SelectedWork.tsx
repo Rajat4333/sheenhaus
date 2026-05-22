@@ -1,8 +1,10 @@
 "use client";
 import { useRef, useState } from "react";
+import Link from "next/link";
 
 type Concept = {
   num: string;
+  slug: string;
   name: string;
   sector: string;
   year: string;
@@ -13,6 +15,7 @@ type Concept = {
 const CONCEPTS: Concept[] = [
   {
     num: "001",
+    slug: "jewellery",
     name: "A Jewellery House",
     sector: "Luxury Retail · Dubai",
     year: "2026",
@@ -21,6 +24,7 @@ const CONCEPTS: Concept[] = [
   },
   {
     num: "002",
+    slug: "hotel",
     name: "A Boutique Hotel",
     sector: "Hospitality · Maldives",
     year: "2026",
@@ -29,6 +33,7 @@ const CONCEPTS: Concept[] = [
   },
   {
     num: "003",
+    slug: "real-estate",
     name: "A Real Estate Group",
     sector: "Premium Property · New York",
     year: "2026",
@@ -37,6 +42,7 @@ const CONCEPTS: Concept[] = [
   },
   {
     num: "004",
+    slug: "healthcare",
     name: "A Surgical Practice",
     sector: "Private Healthcare · Bangalore",
     year: "2026",
@@ -83,12 +89,14 @@ export default function SelectedWork() {
 
       <div>
         {CONCEPTS.map((c) => (
-          <div
+          <Link
             key={c.num}
+            href={`/concepts#${c.slug}`}
             className="work-row group"
             onMouseEnter={() => setActive(c)}
             onMouseLeave={() => setActive(null)}
-            data-cursor="hover"
+            data-cursor="cta"
+            data-cursor-text="View"
           >
             <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-text-dim">
               {c.num}
@@ -96,7 +104,7 @@ export default function SelectedWork() {
             <span className="font-serif text-2xl md:text-3xl text-text leading-none transition-colors duration-500 group-hover:text-accent">
               {c.name}
             </span>
-            <span className="work-meta font-mono text-[11px] uppercase tracking-[0.18em] text-text-mid">
+            <span className="work-meta font-mono text-[11px] uppercase tracking-[0.18em] text-text-mid whitespace-nowrap">
               {c.sector}
               {c.note && (
                 <span className="ml-3 text-accent">· {c.note}</span>
@@ -105,10 +113,10 @@ export default function SelectedWork() {
             <span className="font-mono text-[11px] tracking-[0.12em] text-text-dim md:block hidden">
               {c.year}
             </span>
-            <span className="font-serif italic text-text-dim md:block hidden text-right">
+            <span className="font-serif italic text-text-dim md:block hidden text-right transition-transform duration-500 group-hover:translate-x-1">
               →
             </span>
-          </div>
+          </Link>
         ))}
       </div>
     </div>

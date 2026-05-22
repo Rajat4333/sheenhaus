@@ -18,7 +18,7 @@ export default function StatusStrip() {
         Founding-client pricing through Q4
       </span>
       <span className="hidden md:block w-px h-4 bg-border" />
-      <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-text-dim">
+      <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-text-dim whitespace-nowrap">
         Mumbai · Dubai · New York · London
       </span>
     </div>

@@ -45,16 +45,8 @@ const VERTICALS = [
     desc: "Guests pay premium for the experience. Your website should give them a taste before they book — not a CMS template with blurry photos.",
   },
   {
-    title: "Healthcare & clinics",
+    title: "Private healthcare",
     desc: "Patients compare providers online before choosing. If your site looks like a government portal, they pick the practice that inspires confidence.",
-  },
-  {
-    title: "Manufacturers & B2B",
-    desc: "You supply Fortune 500 companies. Your website looks like it was built a decade ago. Global procurement teams judge credibility digitally first.",
-  },
-  {
-    title: "Professional services",
-    desc: "Law firms, financial advisors, consultancies charging premium rates — with websites that undermine the expertise you bring to every client meeting.",
   },
 ];
 
@@ -166,7 +158,7 @@ function FAQItem({ q, a }: { q: string; a: string }) {
         transition={{ duration: 0.6, ease: [0.2, 0.7, 0.2, 1] }}
         className="overflow-hidden"
       >
-        <p className="pb-8 text-base text-text-mid leading-[1.7] max-w-2xl">
+        <p className="pb-8 text-base text-text-mid leading-[1.8] max-w-2xl">
           {a}
         </p>
       </motion.div>
@@ -174,13 +166,14 @@ function FAQItem({ q, a }: { q: string; a: string }) {
   );
 }
 
-/* ─── Section eyebrow ─── */
-function Eyebrow({ num, label }: { num: string; label: string }) {
+/* ─── Section tag (quiet, no numbering) ─── */
+function Tag({ label }: { label: string }) {
   return (
-    <div className="section-eyebrow">
-      <span className="num">({num})</span>
-      <span>—</span>
-      <span className="label">{label}</span>
+    <div className="inline-flex items-center gap-3">
+      <span className="w-6 h-px bg-accent" />
+      <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-text-mid">
+        {label}
+      </span>
     </div>
   );
 }
@@ -192,8 +185,8 @@ export default function Home() {
       <Navbar />
 
       {/* Ambient warm orbs */}
-      <div className="fixed top-[-300px] right-[-200px] w-[900px] h-[900px] rounded-full bg-[radial-gradient(circle,rgba(201,169,110,0.05)_0%,transparent_60%)] pointer-events-none z-0" />
-      <div className="fixed bottom-[-400px] left-[-300px] w-[800px] h-[800px] rounded-full bg-[radial-gradient(circle,rgba(45,74,58,0.05)_0%,transparent_60%)] pointer-events-none z-0" />
+      <div className="fixed top-[-300px] right-[-200px] w-[900px] h-[900px] rounded-full bg-[radial-gradient(circle,rgba(138,106,53,0.08)_0%,transparent_60%)] pointer-events-none z-0" />
+      <div className="fixed bottom-[-400px] left-[-300px] w-[800px] h-[800px] rounded-full bg-[radial-gradient(circle,rgba(45,74,58,0.06)_0%,transparent_60%)] pointer-events-none z-0" />
 
       {/* ═══════════ HERO ═══════════ */}
       <section className="relative z-10 pt-44 md:pt-56 pb-20 shell">
@@ -202,7 +195,7 @@ export default function Home() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2, delay: 0.9, ease: [0.2, 0.7, 0.2, 1] }}
         >
-          <Eyebrow num="00" label="A Digital Studio · Est. 2026" />
+          <Tag label="A Digital Studio · Est. 2026" />
         </motion.div>
 
         <motion.h1
@@ -215,7 +208,7 @@ export default function Home() {
           <br />
           digital presence of
           <br />
-          <em className="italic-accent gradient-text">premium</em> brands.
+          <em className="italic-accent shine">premium</em> brands.
         </motion.h1>
 
         <motion.div
@@ -229,7 +222,7 @@ export default function Home() {
             target="_blank"
             rel="noopener noreferrer"
             data-cursor="cta"
-            data-cursor-text="Book"
+            data-cursor-text="Schedule"
             className="btn-bronze"
           >
             Book a call <span aria-hidden>→</span>
@@ -239,25 +232,25 @@ export default function Home() {
             data-cursor="hover"
             className="btn-ghost"
           >
-            View the work <span aria-hidden>→</span>
+            View the work <span aria-hidden>↓</span>
           </a>
         </motion.div>
       </section>
 
-      {/* ═══════════ STATUS STRIP ═══════════ */}
-      <section className="relative z-10 shell mt-4">
+      {/* STATUS STRIP */}
+      <section className="relative z-10 shell mt-16">
         <StatusStrip />
       </section>
 
-      {/* ═══════════ CAPABILITIES MARQUEE ═══════════ */}
-      <section className="relative z-10 mt-24">
+      {/* CAPABILITIES MARQUEE */}
+      <section className="relative z-10 mt-28">
         <CapabilitiesMarquee />
       </section>
 
       {/* ═══════════ PRINCIPLES ═══════════ */}
       <section className="relative z-10 shell pt-24">
         <div className="flex items-baseline justify-between mb-10 gap-6">
-          <Eyebrow num="01" label="Principles" />
+          <Tag label="Principles" />
           <span className="hidden md:block font-mono text-[10px] uppercase tracking-[0.22em] text-text-faint">
             How we work, before any brief
           </span>
@@ -272,7 +265,7 @@ export default function Home() {
       {/* ═══════════ WHO IS THIS FOR ═══════════ */}
       <section className="relative z-10 shell section-pad">
         <RevealOnScroll>
-          <Eyebrow num="02" label="Who This Is For" />
+          <Tag label="Who This Is For" />
           <h2 className="font-serif text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.04] tracking-[-0.03em] mt-8 max-w-[20ch]">
             You have built something{" "}
             <em className="italic-accent">remarkable.</em> Your website does not
@@ -280,23 +273,33 @@ export default function Home() {
           </h2>
         </RevealOnScroll>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 mt-24">
-          {VERTICALS.map((v, i) => (
-            <div
-              key={v.title}
-              className="hover-glow border-t border-border py-12 pr-10 last:border-b sm:last:border-b-0 lg:[&:nth-last-child(-n+3)]:border-b sm:[&:nth-last-child(-n+2)]:border-b"
-            >
-              <span className="font-mono text-[11px] tracking-[0.18em] text-accent">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <h3 className="font-serif text-2xl md:text-3xl mt-4 leading-tight tracking-tight">
-                {v.title}
-              </h3>
-              <p className="text-[15px] text-text-mid leading-[1.7] mt-4 max-w-sm">
-                {v.desc}
-              </p>
-            </div>
-          ))}
+        <div className="grid md:grid-cols-2 mt-24 border-t border-border">
+          {VERTICALS.map((v, i) => {
+            const isLeftCol = i % 2 === 0;
+            return (
+              <div
+                key={v.title}
+                className={`hover-glow border-b border-border py-14 group ${
+                  isLeftCol
+                    ? "md:pr-10 md:border-r md:border-border"
+                    : "md:pl-10"
+                }`}
+              >
+                {/* Header row — title left, faint numeral right */}
+                <div className="flex items-start justify-between gap-6">
+                  <h3 className="font-serif text-2xl md:text-3xl leading-tight tracking-tight max-w-[14ch]">
+                    {v.title}
+                  </h3>
+                  <span className="font-mono text-[10px] tracking-[0.22em] text-text-faint pt-2 flex-shrink-0">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                </div>
+                <p className="text-[15px] text-text-mid leading-[1.8] mt-6 max-w-md">
+                  {v.desc}
+                </p>
+              </div>
+            );
+          })}
         </div>
       </section>
 
@@ -307,7 +310,7 @@ export default function Home() {
       {/* ═══════════ SERVICES ═══════════ */}
       <section id="services" className="relative z-10 shell section-pad">
         <RevealOnScroll>
-          <Eyebrow num="03" label="What We Do" />
+          <Tag label="What We Do" />
           <h2 className="font-serif text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.04] tracking-[-0.03em] mt-8 max-w-[22ch]">
             Three disciplines.{" "}
             <em className="italic-accent">One studio.</em> Always senior. Never
@@ -327,7 +330,7 @@ export default function Home() {
               <h3 className="font-serif text-3xl md:text-4xl mt-6 tracking-tight leading-tight">
                 {s.title}
               </h3>
-              <p className="text-[15px] text-text-mid leading-[1.75] mt-6">
+              <p className="text-[15px] text-text-mid leading-[1.8] mt-6">
                 {s.desc}
               </p>
             </div>
@@ -335,18 +338,20 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ═══════════ EDITORIAL PHOTO ANCHOR ═══════════ */}
-      <section className="relative z-10 mt-12">
-        <div className="relative w-full aspect-[21/9] md:aspect-[21/8] overflow-hidden">
+      {/* EDITORIAL PHOTO ANCHOR — inset card, not full-bleed */}
+      <section className="relative z-10 mt-16 mb-16 shell">
+        <div
+          className="relative w-full aspect-[21/9] md:aspect-[21/8] overflow-hidden rounded-sm"
+          style={{ boxShadow: "0 30px 80px -20px rgba(26, 22, 18, 0.18)" }}
+        >
           <div
             className="absolute inset-0"
             style={{
               backgroundImage:
                 "linear-gradient(135deg, #14110e 0%, #2a1f17 35%, #4a3520 70%, #1a1612 100%)",
-              filter: "grayscale(0.4) contrast(1.05)",
+              filter: "grayscale(0.35) contrast(1.05)",
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-bg/40 via-transparent to-bg" />
           {/* Light film grain inside the panel */}
           <div
             className="absolute inset-0 mix-blend-overlay opacity-40 pointer-events-none"
@@ -356,14 +361,16 @@ export default function Home() {
             }}
           />
           <div className="absolute inset-0 flex items-end">
-            <div className="shell w-full pb-16">
-              <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-accent">
+            <div className="w-full px-10 md:px-20 pb-14 md:pb-20">
+              <span className="font-mono text-[11px] uppercase tracking-[0.22em]" style={{ color: "#c9a96e" }}>
                 — From the studio
               </span>
-              <p className="font-serif italic-accent text-[clamp(1.5rem,3.5vw,2.5rem)] leading-[1.25] tracking-[-0.02em] mt-4 max-w-3xl text-text">
-                Most premium businesses have spent decades building an offline
-                brand and three weeks building their online presence. We close
-                that gap.
+              <p className="font-serif italic-accent text-[clamp(1.75rem,3.8vw,2.75rem)] leading-[1.4] tracking-[-0.015em] mt-8 max-w-2xl" style={{ color: "#f0ebe0" }}>
+                Decades building the brand offline.
+                <br />
+                Three weeks building it online.
+                <br />
+                We close that gap.
               </p>
             </div>
           </div>
@@ -374,7 +381,7 @@ export default function Home() {
       <section id="work" className="relative z-10 shell section-pad">
         <div className="flex items-baseline justify-between gap-8 mb-16">
           <div>
-            <Eyebrow num="04" label="Studio Concepts" />
+            <Tag label="Studio Concepts" />
             <h2 className="font-serif text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.04] tracking-[-0.03em] mt-8 max-w-[20ch]">
               A small set of{" "}
               <em className="italic-accent">self-initiated</em> explorations.
@@ -400,7 +407,7 @@ export default function Home() {
 
       {/* ═══════════ PROCESS ═══════════ */}
       <section id="process" className="relative z-10 shell section-pad">
-        <Eyebrow num="05" label="How We Work" />
+        <Tag label="How We Work" />
         <h2 className="font-serif text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.04] tracking-[-0.03em] mt-8 max-w-[22ch]">
           Four phases.{" "}
           <em className="italic-accent">Three weeks.</em> Zero templates.
@@ -421,7 +428,7 @@ export default function Home() {
               <h3 className="font-serif text-2xl mt-4 tracking-tight">
                 {s.title}
               </h3>
-              <p className="text-sm text-text-mid leading-[1.75] mt-4">
+              <p className="text-sm text-text-mid leading-[1.8] mt-4">
                 {s.desc}
               </p>
             </div>
@@ -435,7 +442,7 @@ export default function Home() {
 
       {/* ═══════════ AI SECTION ═══════════ */}
       <section className="relative z-10 shell section-pad">
-        <Eyebrow num="06" label="What Nobody Else Offers" />
+        <Tag label="What Nobody Else Offers" />
         <h2 className="font-serif text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.04] tracking-[-0.03em] mt-8 max-w-[22ch]">
           We engineer AI to{" "}
           <em className="italic-accent">recommend</em> your business.
@@ -445,7 +452,7 @@ export default function Home() {
           <div className="bg-bg-surface border border-border rounded-sm p-10 font-mono text-sm">
             <div className="text-text-dim pb-4 mb-4 border-b border-border leading-relaxed">
               <span className="text-accent">{"> user_query"}</span>
-              <p className="text-text-mid mt-2 leading-[1.7]">
+              <p className="text-text-mid mt-2 leading-[1.8]">
                 What are the best luxury jewellery houses in Dubai for bridal
                 collections?
               </p>
@@ -454,7 +461,7 @@ export default function Home() {
               <span className="text-accent">{"> model_response"}</span>
               <p className="text-text mt-2 leading-[1.9]">
                 Among the most trusted houses,{" "}
-                <span className="text-accent">
+                <span className="text-accent whitespace-nowrap">
                   Al Fardan Jewellers
                 </span>{" "}
                 stands out — known for handcrafted bridal collections and a
@@ -487,7 +494,7 @@ export default function Home() {
                   <h4 className="font-serif text-2xl text-text mb-2 tracking-tight">
                     {p.title}
                   </h4>
-                  <p className="text-[15px] text-text-mid leading-[1.75]">
+                  <p className="text-[15px] text-text-mid leading-[1.8]">
                     {p.desc}
                   </p>
                 </div>
@@ -503,7 +510,7 @@ export default function Home() {
 
       {/* ═══════════ STUDIO / ABOUT ═══════════ */}
       <section id="studio" className="relative z-10 shell section-pad">
-        <Eyebrow num="07" label="The Studio" />
+        <Tag label="The Studio" />
         <h2 className="font-serif text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.04] tracking-[-0.03em] mt-8 max-w-[22ch]">
           A boutique studio. <em className="italic-accent">Senior</em> talent
           only.
@@ -534,7 +541,7 @@ export default function Home() {
               <h3 className="font-serif text-3xl mt-6 mb-5 leading-[1.15] tracking-tight">
                 {p.headline}
               </h3>
-              <p className="text-[15px] text-text-mid leading-[1.75]">{p.desc}</p>
+              <p className="text-[15px] text-text-mid leading-[1.8]">{p.desc}</p>
             </div>
           ))}
         </div>
@@ -558,7 +565,7 @@ export default function Home() {
 
       {/* ═══════════ FAQ ═══════════ */}
       <section id="faq" className="relative z-10 shell section-pad">
-        <Eyebrow num="08" label="Common Questions" />
+        <Tag label="Common Questions" />
         <h2 className="font-serif text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.04] tracking-[-0.03em] mt-8 max-w-[22ch]">
           Things you&apos;re{" "}
           <em className="italic-accent">probably</em> wondering.
@@ -572,14 +579,14 @@ export default function Home() {
       </section>
 
       {/* ═══════════ CTA ═══════════ */}
-      <section id="contact" className="relative z-10 shell section-pad text-center">
-        <Eyebrow num="09" label="Begin a Conversation" />
+      <section id="contact" className="relative z-10 shell pt-32 md:pt-40 pb-24 md:pb-32 text-center">
+        <Tag label="Begin a Conversation" />
         <h2 className="font-serif text-[clamp(2.8rem,7vw,6rem)] leading-[1.04] tracking-[-0.035em] mt-10 max-w-[18ch] mx-auto">
           Your brand deserves{" "}
           <em className="italic-accent gradient-text">better</em> than a
           template.
         </h2>
-        <p className="text-text-mid text-[17px] max-w-xl mx-auto mt-8 leading-[1.7]">
+        <p className="text-text-mid text-[17px] max-w-xl mx-auto mt-8 leading-[1.8]">
           Book a twenty-minute introduction. We will study your current site,
           show you what is possible, and give you an honest assessment —
           wherever you are in the world.
@@ -590,7 +597,7 @@ export default function Home() {
             target="_blank"
             rel="noopener noreferrer"
             data-cursor="cta"
-            data-cursor-text="Book"
+            data-cursor-text="Schedule"
             className="btn-bronze"
           >
             Book a call <span aria-hidden>→</span>
@@ -606,10 +613,10 @@ export default function Home() {
       </section>
 
       {/* ═══════════ STUDIO INDEX FOOTER ═══════════ */}
-      <footer className="relative z-10 mt-20 border-t border-border">
+      <footer className="relative z-10 border-t border-border">
         <div className="shell py-16">
           {/* Massive wordmark */}
-          <div className="font-serif text-[clamp(4rem,18vw,18rem)] leading-[1.0] tracking-[-0.05em] text-text pb-4">
+          <div className="font-serif text-[clamp(4rem,18vw,18rem)] leading-[1.0] tracking-[-0.05em] text-text pb-4 text-center">
             Sheen<em className="italic-accent gradient-text">haus</em>
           </div>
 
@@ -618,9 +625,12 @@ export default function Home() {
               <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-text-faint">
                 The Studio
               </span>
-              <p className="text-text-mid text-sm leading-[1.7] mt-4">
+              <p className="text-text-mid text-sm leading-[1.8] mt-4">
                 A boutique digital studio crafting the presence of premium
-                brands. Mumbai · Dubai · New York · London.
+                brands.
+              </p>
+              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-text-dim mt-4 whitespace-nowrap">
+                Mumbai · Dubai · New York · London
               </p>
             </div>
             <div>
@@ -685,10 +695,10 @@ export default function Home() {
           </div>
 
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mt-14 pt-8 border-t border-border">
-            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-text-faint">
+            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-text-faint whitespace-nowrap">
               Sheenhaus Studio · India · © 2026
             </span>
-            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-text-faint">
+            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-text-faint whitespace-nowrap">
               Crafted by the studio. Every pixel.
             </span>
           </div>
