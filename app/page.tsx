@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import RevealOnScroll from "@/components/RevealOnScroll";
 import CapabilitiesMarquee from "@/components/CapabilitiesMarquee";
@@ -106,9 +107,11 @@ const FAQS = [
   },
 ];
 
-/* ─── Live clock ─── */
+/* ─── Live clock + Studio status ─── */
 function LiveClock() {
   const [time, setTime] = useState("");
+  const [status, setStatus] = useState<"open" | "after-hours">("after-hours");
+
   useEffect(() => {
     const tick = () => {
       const d = new Date();
@@ -119,15 +122,43 @@ function LiveClock() {
         hour12: false,
       });
       setTime(`${ist} IST`);
+
+      // Studio hours: 10:00–19:00 IST, Mon–Sat
+      const istHour = Number(
+        d.toLocaleString("en-GB", {
+          hour: "2-digit",
+          hour12: false,
+          timeZone: "Asia/Kolkata",
+        })
+      );
+      const istDay = new Date(
+        d.toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
+      ).getDay(); // 0 = Sun
+      const isWeekday = istDay >= 1 && istDay <= 6;
+      const isWorking = isWeekday && istHour >= 10 && istHour < 19;
+      setStatus(isWorking ? "open" : "after-hours");
     };
     tick();
     const id = setInterval(tick, 30_000);
     return () => clearInterval(id);
   }, []);
+
   return (
-    <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-text-dim">
-      {time || "— IST"}
-    </span>
+    <div className="flex flex-col gap-2">
+      <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-text-dim whitespace-nowrap">
+        {time || "— IST"}
+      </span>
+      <div className="flex items-center gap-2">
+        <span
+          className={`w-1.5 h-1.5 rounded-full ${
+            status === "open" ? "bg-accent animate-pulse-slow" : "bg-text-faint"
+          }`}
+        />
+        <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-text-faint whitespace-nowrap">
+          {status === "open" ? "Studio · Open" : "Studio · After Hours"}
+        </span>
+      </div>
+    </div>
   );
 }
 
@@ -188,53 +219,124 @@ export default function Home() {
       <div className="fixed top-[-300px] right-[-200px] w-[900px] h-[900px] rounded-full bg-[radial-gradient(circle,rgba(138,106,53,0.08)_0%,transparent_60%)] pointer-events-none z-0" />
       <div className="fixed bottom-[-400px] left-[-300px] w-[800px] h-[800px] rounded-full bg-[radial-gradient(circle,rgba(45,74,58,0.06)_0%,transparent_60%)] pointer-events-none z-0" />
 
-      {/* ═══════════ HERO ═══════════ */}
-      <section className="relative z-10 pt-44 md:pt-56 pb-20 shell">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.2, delay: 0.9, ease: [0.2, 0.7, 0.2, 1] }}
-        >
-          <Tag label="A Digital Studio · Est. 2026" />
-        </motion.div>
+      {/* HERO — full-bleed cinematic photograph, text overlay at bottom-left.
+          The image is the gravity; the type is the caption. */}
+      <section className="relative z-10 w-full h-[100svh] min-h-[680px] overflow-hidden">
+        {/* The photograph */}
+        <Image
+          src="https://images.unsplash.com/photo-1545486332-9e0999c535b2?w=2400&q=90&auto=format&fit=crop"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+          style={{
+            filter: "grayscale(0.35) contrast(1.05) brightness(0.8)",
+          }}
+        />
 
-        <motion.h1
-          className="font-serif text-[clamp(3.5rem,11vw,11rem)] leading-[1.0] tracking-[-0.04em] mt-10 max-w-[18ch] pb-2"
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.4, delay: 1.0, ease: [0.2, 0.7, 0.2, 1] }}
-        >
-          We craft the
-          <br />
-          digital presence of
-          <br />
-          <em className="italic-accent shine">premium</em> brands.
-        </motion.h1>
+        {/* Bronze wash — binds the photo to the page palette */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 mix-blend-multiply pointer-events-none"
+          style={{
+            background:
+              "linear-gradient(135deg, rgba(42,31,23,0.28) 0%, rgba(117,88,43,0.18) 100%)",
+          }}
+        />
 
-        <motion.div
-          className="flex flex-col sm:flex-row gap-5 mt-16"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.0, delay: 1.3, ease: [0.2, 0.7, 0.2, 1] }}
-        >
-          <a
-            href={CAL_LINK}
-            target="_blank"
-            rel="noopener noreferrer"
-            data-cursor="cta"
-            data-cursor-text="Schedule"
-            className="btn-bronze"
+        {/* Film grain */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 mix-blend-overlay opacity-30 pointer-events-none"
+          style={{
+            backgroundImage:
+              "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.92' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.5'/%3E%3C/svg%3E\")",
+          }}
+        />
+
+        {/* Bottom-anchor gradient — gives the headline a dark base to read on */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-x-0 bottom-0 h-3/4 pointer-events-none"
+          style={{
+            background:
+              "linear-gradient(to top, rgba(20,17,14,0.85) 0%, rgba(20,17,14,0.55) 35%, rgba(20,17,14,0) 100%)",
+          }}
+        />
+
+        {/* Content overlay — bottom-left, like a film poster */}
+        <div className="absolute inset-0 z-10 shell flex flex-col justify-end pb-16 md:pb-24">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.2, delay: 0.9, ease: [0.2, 0.7, 0.2, 1] }}
           >
-            Book a call <span aria-hidden>→</span>
-          </a>
-          <a
-            href="#work"
-            data-cursor="hover"
-            className="btn-ghost"
+            <div className="inline-flex items-center gap-3">
+              <span className="w-6 h-px" style={{ background: "#c9a96e" }} />
+              <span
+                className="font-mono text-[12px] uppercase tracking-[0.22em] whitespace-nowrap"
+                style={{ color: "#d9c9a3" }}
+              >
+                A Digital Studio · Est. 2026
+              </span>
+            </div>
+          </motion.div>
+
+          <motion.h1
+            className="display-serif font-serif text-[clamp(3rem,9vw,8rem)] leading-[1.02] tracking-[-0.035em] mt-8 max-w-[18ch] pb-2"
+            style={{ color: "#f0ebe0" }}
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.4, delay: 1.0, ease: [0.2, 0.7, 0.2, 1] }}
           >
-            View the work <span aria-hidden>↓</span>
-          </a>
-        </motion.div>
+            We craft the digital presence of{" "}
+            <em className="italic-accent shine">premium</em> brands.
+          </motion.h1>
+
+          <motion.div
+            className="flex flex-col sm:flex-row gap-5 mt-12"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.0, delay: 1.3, ease: [0.2, 0.7, 0.2, 1] }}
+          >
+            <a
+              href={CAL_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-cursor="cta"
+              data-cursor-text="Schedule"
+              className="btn-bronze"
+            >
+              Book a call <span aria-hidden>→</span>
+            </a>
+            <a
+              href="#work"
+              data-cursor="hover"
+              className="btn-ghost"
+              style={{
+                borderColor: "rgba(240,235,224,0.4)",
+                color: "#f0ebe0",
+              }}
+            >
+              View the work <span aria-hidden>↓</span>
+            </a>
+          </motion.div>
+        </div>
+
+        {/* Scroll cue — bottom-right, very quiet */}
+        <div className="absolute bottom-8 right-8 z-10 hidden md:flex items-center gap-3 pointer-events-none">
+          <span
+            className="font-mono text-[10px] uppercase tracking-[0.28em]"
+            style={{ color: "rgba(240,235,224,0.5)" }}
+          >
+            Scroll
+          </span>
+          <span
+            className="w-px h-10 block"
+            style={{ background: "rgba(240,235,224,0.4)" }}
+          />
+        </div>
       </section>
 
       {/* STATUS STRIP */}
@@ -266,7 +368,7 @@ export default function Home() {
       <section className="relative z-10 shell section-pad">
         <RevealOnScroll>
           <Tag label="Who This Is For" />
-          <h2 className="font-serif text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.04] tracking-[-0.03em] mt-8 max-w-[20ch]">
+          <h2 className="display-serif font-serif text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.04] tracking-[-0.03em] mt-8 max-w-[20ch]">
             You have built something{" "}
             <em className="italic-accent">remarkable.</em> Your website does not
             show it.
@@ -279,7 +381,7 @@ export default function Home() {
             return (
               <div
                 key={v.title}
-                className={`hover-glow border-b border-border py-14 group ${
+                className={`vertical-card group relative border-b border-border pt-14 pb-20 px-2 ${
                   isLeftCol
                     ? "md:pr-10 md:border-r md:border-border"
                     : "md:pl-10"
@@ -287,16 +389,37 @@ export default function Home() {
               >
                 {/* Header row — title left, faint numeral right */}
                 <div className="flex items-start justify-between gap-6">
-                  <h3 className="font-serif text-2xl md:text-3xl leading-tight tracking-tight max-w-[14ch]">
+                  <h3 className="font-serif text-2xl md:text-3xl leading-tight tracking-tight max-w-[14ch] transition-colors duration-700 group-hover:text-accent">
                     {v.title}
                   </h3>
-                  <span className="font-mono text-[10px] tracking-[0.22em] text-text-faint pt-2 flex-shrink-0">
+                  <span className="vertical-card-num font-mono text-[10px] tracking-[0.22em] text-text-faint pt-2 flex-shrink-0 transition-all duration-700 group-hover:text-accent">
                     {String(i + 1).padStart(2, "0")}
                   </span>
                 </div>
-                <p className="text-[15px] text-text-mid leading-[1.8] mt-6 max-w-md">
+                <p className="text-[15px] text-text-mid leading-[1.8] mt-6 max-w-md transition-colors duration-700 group-hover:text-text">
                   {v.desc}
                 </p>
+
+                {/* Hover sweep line — bronze rule along the top edge */}
+                <span
+                  aria-hidden="true"
+                  className="vertical-card-sweep pointer-events-none absolute top-0 left-0 right-0 h-px origin-left scale-x-0 transition-transform duration-[900ms] ease-[cubic-bezier(0.2,0.7,0.2,1)] group-hover:scale-x-100"
+                  style={{
+                    background:
+                      "linear-gradient(90deg, transparent 0%, #8a6a35 35%, #c9a96e 50%, #8a6a35 65%, transparent 100%)",
+                  }}
+                />
+
+                {/* Hover read-more cue, bottom-left */}
+                <span
+                  aria-hidden="true"
+                  className="absolute left-2 md:left-0 bottom-5 inline-flex items-center gap-3 opacity-0 -translate-x-2 transition-all duration-700 ease-[cubic-bezier(0.2,0.7,0.2,1)] group-hover:opacity-100 group-hover:translate-x-0"
+                >
+                  <span className="w-5 h-px bg-accent" />
+                  <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-accent">
+                    Read the thesis
+                  </span>
+                </span>
               </div>
             );
           })}
@@ -311,7 +434,7 @@ export default function Home() {
       <section id="services" className="relative z-10 shell section-pad">
         <RevealOnScroll>
           <Tag label="What We Do" />
-          <h2 className="font-serif text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.04] tracking-[-0.03em] mt-8 max-w-[22ch]">
+          <h2 className="display-serif font-serif text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.04] tracking-[-0.03em] mt-8 max-w-[22ch]">
             Three disciplines.{" "}
             <em className="italic-accent">One studio.</em> Always senior. Never
             outsourced.
@@ -338,26 +461,44 @@ export default function Home() {
         </div>
       </section>
 
-      {/* EDITORIAL PHOTO ANCHOR — inset card, not full-bleed */}
+      {/* EDITORIAL PHOTO ANCHOR — real cinematic photograph, treated */}
       <section className="relative z-10 mt-16 mb-16 shell">
         <div
           className="relative w-full aspect-[21/9] md:aspect-[21/8] overflow-hidden rounded-sm"
           style={{ boxShadow: "0 30px 80px -20px rgba(26, 22, 18, 0.18)" }}
         >
-          <div
-            className="absolute inset-0"
+          <Image
+            src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=2400&q=85&auto=format&fit=crop"
+            alt=""
+            fill
+            sizes="100vw"
+            className="object-cover"
             style={{
-              backgroundImage:
-                "linear-gradient(135deg, #14110e 0%, #2a1f17 35%, #4a3520 70%, #1a1612 100%)",
-              filter: "grayscale(0.35) contrast(1.05)",
+              filter: "grayscale(0.45) contrast(1.1) brightness(0.7)",
             }}
           />
-          {/* Light film grain inside the panel */}
+          {/* Warm bronze wash binds the photo into the page palette */}
           <div
-            className="absolute inset-0 mix-blend-overlay opacity-40 pointer-events-none"
+            className="absolute inset-0 mix-blend-multiply pointer-events-none"
+            style={{
+              background:
+                "linear-gradient(135deg, rgba(20,17,14,0.35) 0%, rgba(74,53,32,0.25) 100%)",
+            }}
+          />
+          {/* Film grain */}
+          <div
+            className="absolute inset-0 mix-blend-overlay opacity-30 pointer-events-none"
             style={{
               backgroundImage:
                 "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.92' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.5'/%3E%3C/svg%3E\")",
+            }}
+          />
+          {/* Bottom anchor gradient */}
+          <div
+            className="absolute inset-x-0 bottom-0 h-2/3 pointer-events-none"
+            style={{
+              background:
+                "linear-gradient(to top, rgba(20,17,14,0.85) 0%, rgba(20,17,14,0) 100%)",
             }}
           />
           <div className="absolute inset-0 flex items-end">
@@ -377,27 +518,27 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ═══════════ STUDIO CONCEPTS ═══════════ */}
+      {/* THESES */}
       <section id="work" className="relative z-10 shell section-pad">
         <div className="flex items-baseline justify-between gap-8 mb-16">
           <div>
-            <Tag label="Studio Concepts" />
-            <h2 className="font-serif text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.04] tracking-[-0.03em] mt-8 max-w-[20ch]">
-              A small set of{" "}
-              <em className="italic-accent">self-initiated</em> explorations.
+            <Tag label="Theses (04)" />
+            <h2 className="display-serif font-serif text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.04] tracking-[-0.03em] mt-8 max-w-[22ch]">
+              Four <em className="italic-accent">positions</em> we hold,
+              before any brief.
             </h2>
           </div>
-          <span className="hidden md:block font-mono text-[10px] uppercase tracking-[0.22em] text-text-faint text-right">
+          <span className="hidden md:block font-mono text-[10px] uppercase tracking-[0.22em] text-text-faint text-right whitespace-nowrap">
             2026
             <br />
-            <span className="text-text-dim">Index · Four concepts</span>
+            <span className="text-text-dim">Index (04)</span>
           </span>
         </div>
         <SelectedWork />
         <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-text-dim mt-12 max-w-md leading-[1.8]">
-          These are self-initiated studio explorations,
+          These are commitments we make to every client
           <br />
-          not commissioned engagements. Full briefs available on request.
+          before the engagement begins. Read each in full →
         </p>
       </section>
 
@@ -408,7 +549,7 @@ export default function Home() {
       {/* ═══════════ PROCESS ═══════════ */}
       <section id="process" className="relative z-10 shell section-pad">
         <Tag label="How We Work" />
-        <h2 className="font-serif text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.04] tracking-[-0.03em] mt-8 max-w-[22ch]">
+        <h2 className="display-serif font-serif text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.04] tracking-[-0.03em] mt-8 max-w-[22ch]">
           Four phases.{" "}
           <em className="italic-accent">Three weeks.</em> Zero templates.
         </h2>
@@ -443,7 +584,7 @@ export default function Home() {
       {/* ═══════════ AI SECTION ═══════════ */}
       <section className="relative z-10 shell section-pad">
         <Tag label="What Nobody Else Offers" />
-        <h2 className="font-serif text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.04] tracking-[-0.03em] mt-8 max-w-[22ch]">
+        <h2 className="display-serif font-serif text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.04] tracking-[-0.03em] mt-8 max-w-[22ch]">
           We engineer AI to{" "}
           <em className="italic-accent">recommend</em> your business.
         </h2>
@@ -511,7 +652,7 @@ export default function Home() {
       {/* ═══════════ STUDIO / ABOUT ═══════════ */}
       <section id="studio" className="relative z-10 shell section-pad">
         <Tag label="The Studio" />
-        <h2 className="font-serif text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.04] tracking-[-0.03em] mt-8 max-w-[22ch]">
+        <h2 className="display-serif font-serif text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.04] tracking-[-0.03em] mt-8 max-w-[22ch]">
           A boutique studio. <em className="italic-accent">Senior</em> talent
           only.
         </h2>
@@ -549,7 +690,7 @@ export default function Home() {
 
       {/* ═══════════ MASSIVE QUOTE ═══════════ */}
       <section className="relative z-10 shell py-40 md:py-56">
-        <blockquote className="font-serif text-[clamp(2rem,5vw,4.5rem)] leading-[1.12] tracking-[-0.025em] text-text max-w-[20ch] mx-auto text-center">
+        <blockquote className="display-serif font-serif text-[clamp(2rem,5vw,4.5rem)] leading-[1.12] tracking-[-0.025em] text-text max-w-[20ch] mx-auto text-center">
           Your website was built by whoever handles your billing software. That
           is like asking your accountant to{" "}
           <em className="italic-accent gradient-text">design your showroom.</em>
@@ -566,7 +707,7 @@ export default function Home() {
       {/* ═══════════ FAQ ═══════════ */}
       <section id="faq" className="relative z-10 shell section-pad">
         <Tag label="Common Questions" />
-        <h2 className="font-serif text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.04] tracking-[-0.03em] mt-8 max-w-[22ch]">
+        <h2 className="display-serif font-serif text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.04] tracking-[-0.03em] mt-8 max-w-[22ch]">
           Things you&apos;re{" "}
           <em className="italic-accent">probably</em> wondering.
         </h2>
@@ -581,7 +722,7 @@ export default function Home() {
       {/* ═══════════ CTA ═══════════ */}
       <section id="contact" className="relative z-10 shell pt-32 md:pt-40 pb-24 md:pb-32 text-center">
         <Tag label="Begin a Conversation" />
-        <h2 className="font-serif text-[clamp(2.8rem,7vw,6rem)] leading-[1.04] tracking-[-0.035em] mt-10 max-w-[18ch] mx-auto">
+        <h2 className="display-serif font-serif text-[clamp(2.8rem,7vw,6rem)] leading-[1.04] tracking-[-0.035em] mt-10 max-w-[18ch] mx-auto">
           Your brand deserves{" "}
           <em className="italic-accent gradient-text">better</em> than a
           template.
@@ -605,7 +746,8 @@ export default function Home() {
           <a
             href={MAIL_LINK}
             data-cursor="hover"
-            className="font-mono text-[11px] uppercase tracking-[0.22em] text-text-dim hover:text-accent transition-colors duration-500"
+            data-link-style="bronze"
+            className="font-mono text-[11px] uppercase tracking-[0.22em] text-text-dim"
           >
             Or write to us → hello@sheenhaus.com
           </a>
@@ -641,7 +783,8 @@ export default function Home() {
                 <a
                   href={MAIL_LINK}
                   data-cursor="hover"
-                  className="text-text text-sm hover:text-accent transition-colors duration-500"
+                  data-link-style="bronze"
+                  className="text-text text-sm"
                 >
                   hello@sheenhaus.com
                 </a>

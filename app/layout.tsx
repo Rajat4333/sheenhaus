@@ -3,6 +3,9 @@ import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
 import PageVeil from "@/components/PageVeil";
 import CursorGlow from "@/components/CursorGlow";
+import AfterHours from "@/components/AfterHours";
+import AmbientAudio from "@/components/AmbientAudio";
+import FaviconSwitcher from "@/components/FaviconSwitcher";
 
 export const metadata: Metadata = {
   title: "Sheenhaus — A digital studio for premium brands",
@@ -33,6 +36,9 @@ export default function RootLayout({
         <PageVeil />
         <SmoothScroll />
         <CursorGlow />
+        <AfterHours />
+        <AmbientAudio />
+        <FaviconSwitcher />
         <div className="page-rise">{children}</div>
       </body>
     </html>
