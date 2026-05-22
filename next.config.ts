@@ -1,12 +1,11 @@
 import type { NextConfig } from "next";
-import path from "node:path";
 
 const nextConfig: NextConfig = {
   // Pin the Turbopack root to this project dir so Vercel doesn't try to
-  // resolve a higher ancestor (the multiple-lockfile warning becomes a build
-  // error in some environments).
+  // resolve a higher ancestor (multiple lockfiles in the tree).
+  // process.cwd() is reliable in both CJS and ESM contexts; __dirname is not.
   turbopack: {
-    root: path.resolve(__dirname),
+    root: process.cwd(),
   },
   experimental: {
     // Native browser View Transitions on App Router navigation
