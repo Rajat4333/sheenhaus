@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import RevealOnScroll from "@/components/RevealOnScroll";
 import CapabilitiesMarquee from "@/components/CapabilitiesMarquee";
@@ -11,6 +12,7 @@ import SelectedWork from "@/components/SelectedWork";
 
 const CAL_LINK = "https://cal.com/sheenhaus/intro";
 const MAIL_LINK = "mailto:hello@sheenhaus.com";
+const INSTAGRAM_LINK = "https://www.instagram.com/sheenhaus_/";
 
 /* ─── SERVICES ─── */
 const SERVICES = [
@@ -36,18 +38,22 @@ const VERTICALS = [
   {
     title: "Jewellery & luxury retail",
     desc: "Your showroom costs crores. Your website was built by your POS vendor. Clients choose competitors whose site feels more considered than yours.",
+    thesis: "slowness",
   },
   {
     title: "Real estate & developers",
     desc: "You sell premium properties. Your website has popup ads, stock photography, and auto-playing videos. Buyers judge the project by the website first.",
+    thesis: "considered-detail",
   },
   {
     title: "Hospitality & hotels",
     desc: "Guests pay premium for the experience. Your website should give them a taste before they book — not a CMS template with blurry photos.",
+    thesis: "slowness",
   },
   {
     title: "Private healthcare",
     desc: "Patients compare providers online before choosing. If your site looks like a government portal, they pick the practice that inspires confidence.",
+    thesis: "trust-through-restraint",
   },
 ];
 
@@ -219,53 +225,72 @@ export default function Home() {
       <div className="fixed top-[-300px] right-[-200px] w-[900px] h-[900px] rounded-full bg-[radial-gradient(circle,rgba(138,106,53,0.08)_0%,transparent_60%)] pointer-events-none z-0" />
       <div className="fixed bottom-[-400px] left-[-300px] w-[800px] h-[800px] rounded-full bg-[radial-gradient(circle,rgba(45,74,58,0.06)_0%,transparent_60%)] pointer-events-none z-0" />
 
-      {/* HERO — full-bleed cinematic photograph, text overlay at bottom-left.
-          The image is the gravity; the type is the caption. */}
+      {/* HERO — cream-on-cream, CSS-only cinematic canvas. No photograph.
+          Warm bronze ambient orb behind the H1, layered gradient sheen,
+          subtle grain. The headline sits on a calm field, the way Aesop
+          and Loro Piana stage their landing copy. */}
       <section className="relative z-10 w-full h-[100svh] min-h-[680px] overflow-hidden">
-        {/* The photograph */}
-        <Image
-          src="https://images.unsplash.com/photo-1545486332-9e0999c535b2?w=2400&q=90&auto=format&fit=crop"
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover"
+        {/* Warm radial — soft bronze glow centred behind the H1 */}
+        <div
+          aria-hidden="true"
+          className="absolute pointer-events-none"
           style={{
-            filter: "grayscale(0.35) contrast(1.05) brightness(0.8)",
+            top: "20%",
+            left: "10%",
+            width: "70vw",
+            height: "70vw",
+            background:
+              "radial-gradient(circle, rgba(201,169,110,0.18) 0%, rgba(201,169,110,0.08) 30%, transparent 65%)",
+            filter: "blur(20px)",
           }}
         />
 
-        {/* Bronze wash — binds the photo to the page palette */}
+        {/* Secondary deep forest accent — far right, very quiet */}
         <div
           aria-hidden="true"
-          className="absolute inset-0 mix-blend-multiply pointer-events-none"
+          className="absolute pointer-events-none"
+          style={{
+            top: "-10%",
+            right: "-10%",
+            width: "50vw",
+            height: "50vw",
+            background:
+              "radial-gradient(circle, rgba(45,74,58,0.08) 0%, transparent 60%)",
+            filter: "blur(20px)",
+          }}
+        />
+
+        {/* Diagonal sheen — barely-there warm gradient pass */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              "linear-gradient(135deg, rgba(42,31,23,0.28) 0%, rgba(117,88,43,0.18) 100%)",
+              "linear-gradient(135deg, rgba(244,239,230,0) 0%, rgba(232,213,179,0.18) 50%, rgba(244,239,230,0) 100%)",
           }}
         />
 
         {/* Film grain */}
         <div
           aria-hidden="true"
-          className="absolute inset-0 mix-blend-overlay opacity-30 pointer-events-none"
+          className="absolute inset-0 mix-blend-multiply opacity-50 pointer-events-none"
           style={{
             backgroundImage:
-              "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.92' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.5'/%3E%3C/svg%3E\")",
+              "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.92' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.4'/%3E%3C/svg%3E\")",
           }}
         />
 
-        {/* Bottom-anchor gradient — gives the headline a dark base to read on */}
+        {/* Subtle bottom vignette — anchors composition without darkening */}
         <div
           aria-hidden="true"
-          className="absolute inset-x-0 bottom-0 h-3/4 pointer-events-none"
+          className="absolute inset-x-0 bottom-0 h-1/3 pointer-events-none"
           style={{
             background:
-              "linear-gradient(to top, rgba(20,17,14,0.85) 0%, rgba(20,17,14,0.55) 35%, rgba(20,17,14,0) 100%)",
+              "linear-gradient(to top, rgba(138,106,53,0.06) 0%, rgba(138,106,53,0) 100%)",
           }}
         />
 
-        {/* Content overlay — bottom-left, like a film poster */}
+        {/* Content — bottom-left, like a film poster */}
         <div className="absolute inset-0 z-10 shell flex flex-col justify-end pb-16 md:pb-24">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -273,19 +298,15 @@ export default function Home() {
             transition={{ duration: 1.2, delay: 0.9, ease: [0.2, 0.7, 0.2, 1] }}
           >
             <div className="inline-flex items-center gap-3">
-              <span className="w-6 h-px" style={{ background: "#c9a96e" }} />
-              <span
-                className="font-mono text-[12px] uppercase tracking-[0.22em] whitespace-nowrap"
-                style={{ color: "#d9c9a3" }}
-              >
+              <span className="w-6 h-px bg-accent" />
+              <span className="font-mono text-[12px] uppercase tracking-[0.22em] text-text-mid whitespace-nowrap">
                 A Digital Studio · Est. 2026
               </span>
             </div>
           </motion.div>
 
           <motion.h1
-            className="display-serif font-serif text-[clamp(3rem,9vw,8rem)] leading-[1.02] tracking-[-0.035em] mt-8 max-w-[18ch] pb-2"
-            style={{ color: "#f0ebe0" }}
+            className="display-serif font-serif text-text text-[clamp(3rem,9vw,8rem)] leading-[1.02] tracking-[-0.035em] mt-8 max-w-[18ch] pb-2"
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.4, delay: 1.0, ease: [0.2, 0.7, 0.2, 1] }}
@@ -314,10 +335,6 @@ export default function Home() {
               href="#work"
               data-cursor="hover"
               className="btn-ghost"
-              style={{
-                borderColor: "rgba(240,235,224,0.4)",
-                color: "#f0ebe0",
-              }}
             >
               View the work <span aria-hidden>↓</span>
             </a>
@@ -326,16 +343,10 @@ export default function Home() {
 
         {/* Scroll cue — bottom-right, very quiet */}
         <div className="absolute bottom-8 right-8 z-10 hidden md:flex items-center gap-3 pointer-events-none">
-          <span
-            className="font-mono text-[10px] uppercase tracking-[0.28em]"
-            style={{ color: "rgba(240,235,224,0.5)" }}
-          >
+          <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-text-faint">
             Scroll
           </span>
-          <span
-            className="w-px h-10 block"
-            style={{ background: "rgba(240,235,224,0.4)" }}
-          />
+          <span className="w-px h-10 block bg-text-faint" />
         </div>
       </section>
 
@@ -379,9 +390,12 @@ export default function Home() {
           {VERTICALS.map((v, i) => {
             const isLeftCol = i % 2 === 0;
             return (
-              <div
+              <Link
                 key={v.title}
-                className={`vertical-card group relative border-b border-border pt-14 pb-20 px-2 ${
+                href={`/concepts#${v.thesis}`}
+                data-cursor="cta"
+                data-cursor-text="Read"
+                className={`vertical-card group relative block border-b border-border pt-14 pb-20 px-2 ${
                   isLeftCol
                     ? "md:pr-10 md:border-r md:border-border"
                     : "md:pl-10"
@@ -417,10 +431,10 @@ export default function Home() {
                 >
                   <span className="w-5 h-px bg-accent" />
                   <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-accent">
-                    Read the thesis
+                    Read the thesis →
                   </span>
                 </span>
-              </div>
+              </Link>
             );
           })}
         </div>
@@ -445,15 +459,15 @@ export default function Home() {
           {SERVICES.map((s) => (
             <div
               key={s.title}
-              className="hover-glow bg-bg p-10 md:p-14 hover:bg-bg-surface transition-colors duration-700"
+              className="lift-card group bg-bg p-10 md:p-14 hover:bg-bg-surface transition-colors duration-700"
             >
-              <span className="font-mono text-[11px] tracking-[0.2em] text-accent">
+              <span className="font-mono text-[11px] tracking-[0.2em] text-accent transition-all duration-700 group-hover:tracking-[0.28em]">
                 ({s.num})
               </span>
-              <h3 className="font-serif text-3xl md:text-4xl mt-6 tracking-tight leading-tight">
+              <h3 className="font-serif text-3xl md:text-4xl mt-6 tracking-tight leading-tight transition-colors duration-700 group-hover:text-accent">
                 {s.title}
               </h3>
-              <p className="text-[15px] text-text-mid leading-[1.8] mt-6">
+              <p className="text-[15px] text-text-mid leading-[1.8] mt-6 transition-colors duration-700 group-hover:text-text">
                 {s.desc}
               </p>
             </div>
@@ -558,18 +572,18 @@ export default function Home() {
           {STEPS.map((s) => (
             <div
               key={s.num}
-              className="bg-bg p-10 md:p-12 hover:bg-bg-surface transition-colors duration-700"
+              className="lift-card group bg-bg p-10 md:p-12 hover:bg-bg-surface transition-colors duration-700"
             >
-              <span className="font-mono text-[11px] tracking-[0.2em] text-accent">
+              <span className="font-mono text-[11px] tracking-[0.2em] text-accent transition-all duration-700 group-hover:tracking-[0.28em]">
                 {s.time}
               </span>
-              <div className="font-serif text-7xl md:text-8xl text-accent/15 leading-none mt-6">
+              <div className="font-serif text-7xl md:text-8xl text-accent/15 leading-none mt-6 transition-colors duration-700 group-hover:text-accent/40">
                 {s.num}
               </div>
-              <h3 className="font-serif text-2xl mt-4 tracking-tight">
+              <h3 className="font-serif text-2xl mt-4 tracking-tight transition-colors duration-700 group-hover:text-accent">
                 {s.title}
               </h3>
-              <p className="text-sm text-text-mid leading-[1.8] mt-4">
+              <p className="text-sm text-text-mid leading-[1.8] mt-4 transition-colors duration-700 group-hover:text-text">
                 {s.desc}
               </p>
             </div>
@@ -627,15 +641,15 @@ export default function Home() {
                 desc: "We track which AI queries mention your brand versus competitors. You watch the score improve month over month.",
               },
             ].map((p, i) => (
-              <div key={p.title} className="flex gap-6 group">
-                <span className="font-mono text-[11px] tracking-[0.18em] text-accent pt-1">
+              <div key={p.title} className="lift-row flex gap-6 group">
+                <span className="lift-row-num font-mono text-[11px] tracking-[0.18em] text-accent pt-1">
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <div>
-                  <h4 className="font-serif text-2xl text-text mb-2 tracking-tight">
+                  <h4 className="font-serif text-2xl text-text mb-2 tracking-tight transition-colors duration-700 group-hover:text-accent">
                     {p.title}
                   </h4>
-                  <p className="text-[15px] text-text-mid leading-[1.8]">
+                  <p className="text-[15px] text-text-mid leading-[1.8] transition-colors duration-700 group-hover:text-text">
                     {p.desc}
                   </p>
                 </div>
@@ -675,14 +689,14 @@ export default function Home() {
               desc: "We translate business objectives into digital experiences that convert. Direct collaboration from first call to launch — no account managers, no handoffs, no junior staff learning on your engagement.",
             },
           ].map((p) => (
-            <div key={p.role} className="bg-bg p-10 md:p-14">
-              <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-accent">
+            <div key={p.role} className="lift-card group bg-bg p-10 md:p-14 hover:bg-bg-surface transition-colors duration-700">
+              <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-accent transition-all duration-700 group-hover:tracking-[0.28em]">
                 {p.role}
               </span>
-              <h3 className="font-serif text-3xl mt-6 mb-5 leading-[1.15] tracking-tight">
+              <h3 className="font-serif text-3xl mt-6 mb-5 leading-[1.15] tracking-tight transition-colors duration-700 group-hover:text-accent">
                 {p.headline}
               </h3>
-              <p className="text-[15px] text-text-mid leading-[1.8]">{p.desc}</p>
+              <p className="text-[15px] text-text-mid leading-[1.8] transition-colors duration-700 group-hover:text-text">{p.desc}</p>
             </div>
           ))}
         </div>
@@ -796,6 +810,15 @@ export default function Home() {
                   className="text-text-mid text-sm hover:text-accent transition-colors duration-500"
                 >
                   Book a call →
+                </a>
+                <a
+                  href={INSTAGRAM_LINK}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-cursor="hover"
+                  className="text-text-mid text-sm hover:text-accent transition-colors duration-500"
+                >
+                  Instagram →
                 </a>
               </div>
             </div>

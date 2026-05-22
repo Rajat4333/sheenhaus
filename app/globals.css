@@ -1,5 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
-@import url('https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,600,700,800,900&display=swap');
+/* Satoshi via Fontshare — only the 3 weights actually used in the JSX/CSS.
+   (Instrument Serif + IBM Plex Mono are loaded via next/font in layout.tsx
+   for self-hosting + zero render-blocking CSS.) */
+@import url('https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600&display=swap');
 
 @import "tailwindcss";
 
@@ -24,9 +26,11 @@
   --color-text-faint: #8a7d68;      /* tiny meta */
 
   /* ── Type ────────────────────────────────────────────────── */
-  --font-serif: 'Instrument Serif', 'Times New Roman', Georgia, serif;
+  /* next/font injects --font-instrument-serif and --font-ibm-plex-mono.
+     We layer the family name fallback in case the variable isn't ready. */
+  --font-serif: var(--font-instrument-serif), 'Instrument Serif', Georgia, serif;
   --font-sans: 'Satoshi', system-ui, sans-serif;
-  --font-mono: 'IBM Plex Mono', monospace;
+  --font-mono: var(--font-ibm-plex-mono), 'IBM Plex Mono', monospace;
 
   /* ── Motion ──────────────────────────────────────────────── */
   --animate-pulse-slow: pulse-slow 3.5s ease-in-out infinite;
@@ -129,7 +133,7 @@ html[data-hours="after"] {
    Forcing weight 400 prevents the browser from synthesizing bold on headings,
    which shifts metrics and produces awkward stroke endings. */
 .font-serif {
-  font-family: 'Instrument Serif', Georgia, serif;
+  font-family: var(--font-instrument-serif), 'Instrument Serif', Georgia, serif;
   font-weight: 400;
   font-feature-settings: 'liga', 'dlig';
   font-synthesis: none;
@@ -219,7 +223,7 @@ body::after {
 
 /* Italic accent */
 .italic-accent {
-  font-family: 'Instrument Serif', Georgia, serif;
+  font-family: var(--font-instrument-serif), 'Instrument Serif', Georgia, serif;
   font-style: italic;
   letter-spacing: -0.025em;
   /* Italics lean right — give the trailing glyph a touch of room
@@ -265,6 +269,77 @@ body::after {
     transform: none;
     transition: none;
     box-shadow: none;
+  }
+}
+
+/* Lift card — reusable premium hover for grid cards (Services, Process,
+   Studio). Lifts subtly, drops a soft warm shadow, and a bronze sweep
+   line draws across the top edge. ~700ms editorial easing. */
+.lift-card {
+  position: relative;
+  transition:
+    transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1),
+    background-color 700ms ease,
+    box-shadow 800ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  will-change: transform;
+  isolation: isolate;
+}
+.lift-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    #8a6a35 35%,
+    #c9a96e 50%,
+    #8a6a35 65%,
+    transparent 100%
+  );
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 900ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  pointer-events: none;
+  z-index: 1;
+}
+.lift-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 30px 60px -28px rgba(26, 22, 18, 0.18);
+}
+.lift-card:hover::before {
+  transform: scaleX(1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .lift-card, .lift-card:hover, .lift-card::before, .lift-card:hover::before {
+    transform: none;
+    transition: none;
+    box-shadow: none;
+  }
+}
+
+/* Lift row — for inline numbered items (AI section, Practice list).
+   Subtler than .lift-card: just shifts the row right + numeral colours up. */
+.lift-row {
+  transition: transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.lift-row:hover {
+  transform: translateX(6px);
+}
+.lift-row .lift-row-num {
+  transition: color 700ms ease, transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  transform-origin: left center;
+}
+.lift-row:hover .lift-row-num {
+  color: var(--color-accent-bright);
+  transform: scale(1.2);
+}
+@media (prefers-reduced-motion: reduce) {
+  .lift-row, .lift-row:hover, .lift-row .lift-row-num, .lift-row:hover .lift-row-num {
+    transform: none;
+    transition: none;
   }
 }
 
@@ -320,7 +395,7 @@ a[data-link-style="bronze"]:hover {
 /* Display serif — same Instrument Serif the rest of the site uses.
    Class kept so we can later swap to a variable face without touching JSX. */
 .display-serif {
-  font-family: 'Instrument Serif', Georgia, serif;
+  font-family: var(--font-instrument-serif), 'Instrument Serif', Georgia, serif;
   font-feature-settings: 'liga', 'dlig';
 }
 
@@ -409,10 +484,10 @@ a[data-link-style="bronze"]:hover {
   background: #f4efe6;
   z-index: 100;
   pointer-events: none;
-  /* Veil lifts only after the wordmark has had its moment.
-     wordmark fade-in (0.9s) + hold (0.3s) + wordmark out (0.6s) = ~1.8s */
-  animation: veil-out 0.9s cubic-bezier(0.7, 0, 0.2, 1) forwards;
-  animation-delay: 1.8s;
+  /* React unmounts the veil when the page is paint-ready (min 800ms).
+     We just fade the whole thing out as it leaves. */
+  animation: veil-fade-out 0.5s cubic-bezier(0.7, 0, 0.2, 1) forwards;
+  animation-delay: 0.6s;
 }
 
 .page-veil-mark {
@@ -426,10 +501,8 @@ a[data-link-style="bronze"]:hover {
   color: var(--color-text-mid);
   opacity: 0;
   transform: translate(-50%, -50%);
-  animation:
-    veil-mark-in   0.9s cubic-bezier(0.2, 0.7, 0.2, 1) forwards,
-    veil-mark-out  0.6s cubic-bezier(0.7, 0, 0.2, 1) forwards;
-  animation-delay: 0.2s, 1.4s;
+  animation: veil-mark-in 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+  animation-delay: 0.1s;
 }
 .page-veil-mark em {
   font-style: italic;
@@ -440,9 +513,9 @@ a[data-link-style="bronze"]:hover {
   0%   { opacity: 0; transform: translate(-50%, calc(-50% + 6px)); }
   100% { opacity: 1; transform: translate(-50%, -50%); }
 }
-@keyframes veil-mark-out {
-  0%   { opacity: 1; transform: translate(-50%, -50%); }
-  100% { opacity: 0; transform: translate(-50%, calc(-50% - 8px)); }
+@keyframes veil-fade-out {
+  0%   { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 .page-rise {
@@ -486,7 +559,7 @@ a[data-link-style="bronze"]:hover {
   align-items: center;
   justify-content: center;
   color: #f4efe6;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: var(--font-ibm-plex-mono), 'IBM Plex Mono', monospace;
   font-size: 10px;
   font-weight: 500;
   text-transform: uppercase;
@@ -599,7 +672,7 @@ a[data-link-style="bronze"]:hover {
 
 /* ── Recognition logos ─────────────────────────────────────── */
 .recognition-mark {
-  font-family: 'Instrument Serif', Georgia, serif;
+  font-family: var(--font-instrument-serif), 'Instrument Serif', Georgia, serif;
   font-style: italic;
   color: var(--color-text-dim);
   opacity: 0.55;

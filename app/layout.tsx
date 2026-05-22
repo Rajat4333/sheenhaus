@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Instrument_Serif, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
 import PageVeil from "@/components/PageVeil";
@@ -6,6 +7,23 @@ import CursorGlow from "@/components/CursorGlow";
 import AfterHours from "@/components/AfterHours";
 import AmbientAudio from "@/components/AmbientAudio";
 import FaviconSwitcher from "@/components/FaviconSwitcher";
+
+// Self-host fonts via Next.js — eliminates render-blocking external CSS,
+// auto-preloads, ships only the weights we use.
+const instrumentSerif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
+  variable: "--font-instrument-serif",
+  display: "swap",
+});
+
+const ibmPlexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-ibm-plex-mono",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Sheenhaus — A digital studio for premium brands",
@@ -31,7 +49,10 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html
+      lang="en"
+      className={`${instrumentSerif.variable} ${ibmPlexMono.variable}`}
+    >
       <body className="overflow-x-hidden">
         <PageVeil />
         <SmoothScroll />

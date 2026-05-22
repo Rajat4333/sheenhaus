@@ -21,17 +21,6 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Before scrolling, the navbar sits on top of the dark hero photograph
-  // → cream foreground colours. After scrolling, it sits on the cream page
-  // → warm-dark foreground colours. Smooth color transition between states.
-  const wordmarkColor = scrolled ? "#1a1612" : "#f0ebe0";
-  const linkColor     = scrolled ? "#4a4233" : "rgba(240,235,224,0.75)";
-  const linkHover     = scrolled ? "#1a1612" : "#f0ebe0";
-  const faintColor    = scrolled ? "#6a5e48" : "rgba(240,235,224,0.55)";
-  const dividerColor  = scrolled ? "#d3cbb8" : "rgba(240,235,224,0.25)";
-  const ctaColor      = scrolled ? "#1a1612" : "#f0ebe0";
-  const hamburgerBg   = scrolled ? "#1a1612" : "#f0ebe0";
-
   return (
     <>
       <motion.nav
@@ -43,11 +32,10 @@ export default function Navbar() {
         transition={{ duration: 1.0, delay: 0.6, ease: [0.2, 0.7, 0.2, 1] }}
       >
         <div className="shell flex items-center justify-between h-[88px]">
-          {/* Wordmark only */}
+          {/* Wordmark */}
           <Link
             href="/"
-            className="font-serif text-[26px] tracking-[-0.02em] leading-none transition-colors duration-700"
-            style={{ color: wordmarkColor }}
+            className="font-serif text-[26px] tracking-[-0.02em] text-text leading-none"
             data-cursor="hover"
           >
             Sheenhaus
@@ -60,21 +48,12 @@ export default function Navbar() {
                 key={link.href}
                 href={link.href}
                 data-cursor="hover"
-                className="nav-link font-mono text-[11px] uppercase tracking-[0.22em] transition-colors duration-700"
-                style={
-                  {
-                    color: linkColor,
-                    ["--hover-color" as string]: linkHover,
-                  } as React.CSSProperties
-                }
+                className="font-mono text-[11px] uppercase tracking-[0.22em] text-text-mid hover:text-text transition-colors duration-700"
               >
                 {link.label}
               </a>
             ))}
-            <span
-              className="hidden lg:inline-block font-mono text-[10px] uppercase tracking-[0.22em] pl-6 border-l transition-colors duration-700"
-              style={{ color: faintColor, borderColor: dividerColor }}
-            >
+            <span className="hidden lg:inline-block font-mono text-[10px] uppercase tracking-[0.22em] text-text-faint pl-6 border-l border-border">
               Accepting briefs
             </span>
             <a
@@ -83,8 +62,7 @@ export default function Navbar() {
               rel="noopener noreferrer"
               data-cursor="cta"
               data-cursor-text="Schedule"
-              className="font-mono text-[11px] uppercase tracking-[0.22em] hover:text-accent transition-colors duration-700"
-              style={{ color: ctaColor }}
+              className="font-mono text-[11px] uppercase tracking-[0.22em] text-text hover:text-accent transition-colors duration-700"
             >
               Reserve <span aria-hidden>→</span>
             </a>
@@ -98,18 +76,15 @@ export default function Navbar() {
             data-cursor="hover"
           >
             <motion.span
-              className="w-6 h-px block transition-colors duration-700"
-              style={{ background: hamburgerBg }}
+              className="w-6 h-px bg-text block"
               animate={mobileOpen ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
             />
             <motion.span
-              className="w-6 h-px block transition-colors duration-700"
-              style={{ background: hamburgerBg }}
+              className="w-6 h-px bg-text block"
               animate={mobileOpen ? { opacity: 0 } : { opacity: 1 }}
             />
             <motion.span
-              className="w-6 h-px block transition-colors duration-700"
-              style={{ background: hamburgerBg }}
+              className="w-6 h-px bg-text block"
               animate={mobileOpen ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }}
             />
           </button>
