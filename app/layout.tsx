@@ -6,6 +6,7 @@ import PageVeil from "@/components/PageVeil";
 import AfterHours from "@/components/AfterHours";
 import AmbientAudio from "@/components/AmbientAudio";
 import FaviconSwitcher from "@/components/FaviconSwitcher";
+import { Analytics } from "@vercel/analytics/next";
 
 // Self-host fonts via Next.js — eliminates render-blocking external CSS,
 // auto-preloads, ships only the weights we use.
@@ -59,6 +60,7 @@ export default function RootLayout({
         <AmbientAudio />
         <FaviconSwitcher />
         <div className="page-rise">{children}</div>
+        <Analytics />
       </body>
     </html>
   );
