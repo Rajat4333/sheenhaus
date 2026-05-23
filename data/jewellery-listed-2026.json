@@ -1,0 +1,348 @@
+{
+  "set": {
+    "slug": "jewellery-listed",
+    "year": 2026,
+    "vertical": "Jewellery",
+    "framing": "India's publicly-listed jewellery houses"
+  },
+  "generatedAt": "2026-05-23T18:23:42.952Z",
+  "results": [
+    {
+      "brand": {
+        "displayName": "Tanishq",
+        "parent": "Titan Company",
+        "ticker": "TITAN",
+        "domain": "tanishq.co.in",
+        "marketCapCr": 362199,
+        "qtrSalesCr": 26920,
+        "pe": 70.36
+      },
+      "audit": {
+        "unreachable": true,
+        "url": "https://tanishq.co.in/",
+        "reason": "blocked",
+        "status": 403,
+        "headline": "This site does not allow our audit through.",
+        "body": "It looks like the site is fronted by a firewall or CDN that blocks automated traffic. Many established brands set this up to protect against scraping. We will need to look at it together to give you an honest score."
+      }
+    },
+    {
+      "brand": {
+        "displayName": "Kalyan Jewellers",
+        "parent": null,
+        "ticker": "KALYANKJIL",
+        "domain": "kalyanjewellers.net",
+        "marketCapCr": 36393.76,
+        "qtrSalesCr": 10274.94,
+        "pe": 26.41
+      },
+      "audit": {
+        "url": "https://kalyanjewellers.net/",
+        "score": 24,
+        "scores": {
+          "performance": 8,
+          "craft": 8,
+          "trust": 43,
+          "discoverability": 43
+        },
+        "signs": [
+          {
+            "num": "01",
+            "title": "Built on a template / page-builder stack",
+            "category": "craft",
+            "severity": "high"
+          },
+          {
+            "num": "02",
+            "title": "Popups, modals, or chat widgets at arrival",
+            "category": "craft",
+            "severity": "high"
+          },
+          {
+            "num": "05",
+            "title": "Exposed CMS scaffolding in URLs",
+            "category": "trust",
+            "severity": "high"
+          },
+          {
+            "num": "06",
+            "title": "Too many font weights — type system not under control",
+            "category": "craft",
+            "severity": "medium"
+          },
+          {
+            "num": "07",
+            "title": "Bloated contact form (4+ fields)",
+            "category": "trust",
+            "severity": "medium"
+          }
+        ],
+        "pagespeed": null,
+        "meta": {
+          "fetchedAt": "2026-05-23T18:22:48.749Z",
+          "durationMs": 1219,
+          "htmlSizeBytes": 190906
+        }
+      }
+    },
+    {
+      "brand": {
+        "displayName": "Thangamayil Jewellery",
+        "parent": null,
+        "ticker": "THANGAMAYL",
+        "domain": "thangamayil.com",
+        "marketCapCr": 11864.94,
+        "qtrSalesCr": 2839.17,
+        "pe": 33.57
+      },
+      "audit": {
+        "url": "https://thangamayil.com/",
+        "score": 52,
+        "scores": {
+          "performance": 43,
+          "craft": 43,
+          "trust": 78,
+          "discoverability": 35
+        },
+        "signs": [
+          {
+            "num": "12",
+            "title": "Missing structured data for AI discoverability",
+            "category": "discoverability",
+            "severity": "high"
+          },
+          {
+            "num": "01",
+            "title": "Built on a template / page-builder stack",
+            "category": "craft",
+            "severity": "high"
+          },
+          {
+            "num": "06",
+            "title": "Too many font weights — type system not under control",
+            "category": "craft",
+            "severity": "medium"
+          },
+          {
+            "num": "07",
+            "title": "Bloated contact form (4+ fields)",
+            "category": "trust",
+            "severity": "medium"
+          }
+        ],
+        "pagespeed": null,
+        "meta": {
+          "fetchedAt": "2026-05-23T18:22:58.578Z",
+          "durationMs": 1818,
+          "htmlSizeBytes": 312153
+        }
+      }
+    },
+    {
+      "brand": {
+        "displayName": "PC Jeweller",
+        "parent": null,
+        "ticker": "PCJEWELLER",
+        "domain": "pcjeweller.com",
+        "marketCapCr": 8127.72,
+        "qtrSalesCr": 875.38,
+        "pe": 12.37
+      },
+      "audit": {
+        "url": "https://pcjeweller.com/",
+        "score": 60,
+        "scores": {
+          "performance": 65,
+          "craft": 65,
+          "trust": 65,
+          "discoverability": 30
+        },
+        "signs": [
+          {
+            "num": "12",
+            "title": "Missing structured data for AI discoverability",
+            "category": "discoverability",
+            "severity": "high"
+          },
+          {
+            "num": "01",
+            "title": "Built on a template / page-builder stack",
+            "category": "craft",
+            "severity": "high"
+          },
+          {
+            "num": "05",
+            "title": "Exposed CMS scaffolding in URLs",
+            "category": "trust",
+            "severity": "high"
+          }
+        ],
+        "pagespeed": null,
+        "meta": {
+          "fetchedAt": "2026-05-23T18:23:07.503Z",
+          "durationMs": 913,
+          "htmlSizeBytes": 438183
+        }
+      }
+    },
+    {
+      "brand": {
+        "displayName": "Sky Gold & Diamonds",
+        "parent": null,
+        "ticker": "SKYGOLD",
+        "domain": "skygold.co.in",
+        "marketCapCr": 7278.3,
+        "qtrSalesCr": 1767.68,
+        "pe": 31.74
+      },
+      "audit": {
+        "url": "https://skygold.co.in/",
+        "score": 28,
+        "scores": {
+          "performance": 8,
+          "craft": 8,
+          "trust": 65,
+          "discoverability": 30
+        },
+        "signs": [
+          {
+            "num": "12",
+            "title": "Missing structured data for AI discoverability",
+            "category": "discoverability",
+            "severity": "high"
+          },
+          {
+            "num": "01",
+            "title": "Built on a template / page-builder stack",
+            "category": "craft",
+            "severity": "high"
+          },
+          {
+            "num": "02",
+            "title": "Popups, modals, or chat widgets at arrival",
+            "category": "craft",
+            "severity": "high"
+          },
+          {
+            "num": "03",
+            "title": "Autoplay video in the hero",
+            "category": "craft",
+            "severity": "medium"
+          },
+          {
+            "num": "05",
+            "title": "Exposed CMS scaffolding in URLs",
+            "category": "trust",
+            "severity": "high"
+          }
+        ],
+        "pagespeed": null,
+        "meta": {
+          "fetchedAt": "2026-05-23T18:23:17.481Z",
+          "durationMs": 1967,
+          "htmlSizeBytes": 290792
+        }
+      }
+    },
+    {
+      "brand": {
+        "displayName": "BlueStone",
+        "parent": "Bluestone Jewel Ltd",
+        "ticker": "BLUESTONE",
+        "domain": "bluestone.com",
+        "marketCapCr": 7229.53,
+        "qtrSalesCr": 681.47,
+        "pe": 487.17
+      },
+      "audit": {
+        "url": "https://bluestone.com/",
+        "score": 53,
+        "scores": {
+          "performance": 43,
+          "craft": 43,
+          "trust": 65,
+          "discoverability": 65
+        },
+        "signs": [
+          {
+            "num": "01",
+            "title": "Built on a template / page-builder stack",
+            "category": "craft",
+            "severity": "high"
+          },
+          {
+            "num": "03",
+            "title": "Autoplay video in the hero",
+            "category": "craft",
+            "severity": "medium"
+          },
+          {
+            "num": "05",
+            "title": "Exposed CMS scaffolding in URLs",
+            "category": "trust",
+            "severity": "high"
+          }
+        ],
+        "pagespeed": null,
+        "meta": {
+          "fetchedAt": "2026-05-23T18:23:26.293Z",
+          "durationMs": 801,
+          "htmlSizeBytes": 460083
+        }
+      }
+    },
+    {
+      "brand": {
+        "displayName": "P. N. Gadgil & Sons",
+        "parent": null,
+        "ticker": "PNGJL",
+        "domain": "pngadgilandsons.com",
+        "marketCapCr": 7134.19,
+        "qtrSalesCr": 3544.31,
+        "pe": 17.3
+      },
+      "audit": {
+        "url": "https://pngadgilandsons.com/",
+        "score": 34,
+        "scores": {
+          "performance": 8,
+          "craft": 8,
+          "trust": 65,
+          "discoverability": 65
+        },
+        "signs": [
+          {
+            "num": "01",
+            "title": "Built on a template / page-builder stack",
+            "category": "craft",
+            "severity": "high"
+          },
+          {
+            "num": "02",
+            "title": "Popups, modals, or chat widgets at arrival",
+            "category": "craft",
+            "severity": "high"
+          },
+          {
+            "num": "05",
+            "title": "Exposed CMS scaffolding in URLs",
+            "category": "trust",
+            "severity": "high"
+          },
+          {
+            "num": "06",
+            "title": "Too many font weights — type system not under control",
+            "category": "craft",
+            "severity": "medium"
+          }
+        ],
+        "pagespeed": null,
+        "meta": {
+          "fetchedAt": "2026-05-23T18:23:34.950Z",
+          "durationMs": 646,
+          "htmlSizeBytes": 189637
+        }
+      }
+    }
+  ]
+}

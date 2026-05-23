@@ -583,6 +583,60 @@ export default function Home() {
         <div className="hairline" />
       </div>
 
+      {/* FIELD REPORT — the diagnostic applied to a real category.
+          Bridges the editorial /signs essay into a *named*, *measured*
+          state-of-the-category report. The card carries two real figures
+          so the visitor sees this is not theory. */}
+      <section className="relative z-10 shell section-pad">
+        <RevealOnScroll>
+          <div className="grid lg:grid-cols-[1fr_auto] gap-12 lg:gap-20 items-end">
+            <div>
+              <Tag label="A Field Report" />
+              <h2 className="display-serif font-serif text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.04] tracking-[-0.03em] mt-8 max-w-[22ch]">
+                We audited{" "}
+                <em className="italic-accent">every listed</em> Indian
+                jewellery house. None broke 60.
+              </h2>
+              <p className="text-text-mid text-[17px] max-w-2xl mt-10 leading-[1.8]">
+                Seven publicly-traded jewellery companies. ₹4.4 lakh crore of
+                offline brand value between them. The median Sheenhaus Score
+                is 52. The largest house refuses to be audited at all. The
+                first instalment of our state-of-the-category series.
+              </p>
+              {/* Two anchored figures pulled from the audit data */}
+              <div className="grid grid-cols-2 gap-8 sm:gap-12 max-w-md mt-10">
+                <div>
+                  <div className="display-serif font-serif text-[clamp(2.5rem,5vw,3.5rem)] leading-none tracking-[-0.03em] text-accent tabular-nums">
+                    52
+                  </div>
+                  <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-text-faint mt-3 leading-tight">
+                    Median score / 100
+                  </p>
+                </div>
+                <div>
+                  <div className="display-serif font-serif text-[clamp(2.5rem,5vw,3.5rem)] leading-none tracking-[-0.03em] text-accent tabular-nums">
+                    100<span className="text-[0.6em] align-top">%</span>
+                  </div>
+                  <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-text-faint mt-3 leading-tight">
+                    Built on templates
+                  </p>
+                </div>
+              </div>
+            </div>
+            <Link
+              href="/state-of-premium/jewellery"
+              className="btn-bronze self-start lg:self-end whitespace-nowrap"
+            >
+              Read the report <span aria-hidden>&rarr;</span>
+            </Link>
+          </div>
+        </RevealOnScroll>
+      </section>
+
+      <div className="shell">
+        <div className="hairline" />
+      </div>
+
       {/* SERVICES */}
       <section id="services" className="relative z-10 shell section-pad">
         <RevealOnScroll>
