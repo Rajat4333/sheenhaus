@@ -32,7 +32,8 @@ export default function Navbar() {
         transition={{ duration: 1.0, delay: 0.6, ease: [0.2, 0.7, 0.2, 1] }}
       >
         <div className="shell flex items-center justify-between h-[88px]">
-          {/* Wordmark */}
+          {/* Wordmark only — clean type, no mark. Luxury studios
+              (Aesop, Aman, Loro Piana, The Row) all use wordmark navbars. */}
           <Link
             href="/"
             className="font-serif text-[26px] tracking-[-0.02em] text-text leading-none"

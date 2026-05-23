@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000">
+  <defs>
+    <radialGradient id="bg" cx="57.28321150505644%" cy="40%" r="80%">
+      <stop offset="0%"   stop-color="#f8f3e8" />
+      <stop offset="45%"  stop-color="#f0eadc" />
+      <stop offset="100%" stop-color="#e6dec9" />
+    </radialGradient>
+
+    <linearGradient id="ring-bronze" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#8a6a35" />
+      <stop offset="40%"  stop-color="#c9a96e" />
+      <stop offset="55%"  stop-color="#e7d4a4" />
+      <stop offset="70%"  stop-color="#c9a96e" />
+      <stop offset="100%" stop-color="#75582b" />
+    </linearGradient>
+
+    <linearGradient id="ring-bronze-inner" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#8a6a35" stop-opacity="0.4" />
+      <stop offset="50%"  stop-color="#c9a96e" stop-opacity="0.5" />
+      <stop offset="100%" stop-color="#75582b" stop-opacity="0.4" />
+    </linearGradient>
+
+    <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="14" />
+      <feOffset dx="0" dy="22" result="shadow" />
+      <feColorMatrix in="shadow" type="matrix" values="
+        0 0 0 0 0.1
+        0 0 0 0 0.08
+        0 0 0 0 0.06
+        0 0 0 0.25 0" />
+      <feMerge>
+        <feMergeNode />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" />
+      <feColorMatrix values="0 0 0 0 0
+                             0 0 0 0 0
+                             0 0 0 0 0
+                             0 0 0 0.05 0" />
+      <feComposite in2="SourceGraphic" operator="in" />
+    </filter>
+  </defs>
+
+  <!-- Backdrop -->
+  <rect width="100%" height="100%" fill="url(#bg)" />
+
+  <!-- Subtle diagonal sheen -->
+  <rect width="100%" height="100%" opacity="0.4" fill="url(#bg)" style="mix-blend-mode: overlay" />
+
+  <!-- The form -->
+  <g transform="translate(800 500)" filter="url(#softShadow)">
+    <!-- Outer ring (the main sculptural form) -->
+    <ellipse
+      cx="0" cy="0"
+      rx="290.77412968665476" ry="280"
+      fill="none"
+      stroke="url(#ring-bronze)"
+      stroke-width="6.713247345078464"
+      opacity="0.9517467754404424"
+    />
+
+    <!-- Inner ring (perpendicular axis, adds depth) -->
+    <ellipse
+      cx="0" cy="0"
+      rx="121.9649610707901" ry="240.79999999999998"
+      fill="none"
+      stroke="url(#ring-bronze-inner)"
+      stroke-width="1.5"
+    />
+
+    <!-- Centre point — tiny bronze dot -->
+    <circle cx="0" cy="0" r="3" fill="#8a6a35" opacity="0.5" />
+  </g>
+
+  <!-- Grain overlay -->
+  <rect width="100%" height="100%" filter="url(#grain)" opacity="0.5" />
+</svg>

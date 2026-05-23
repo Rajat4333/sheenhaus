@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useTransform, type MotionValue } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
@@ -9,6 +9,7 @@ import CapabilitiesMarquee from "@/components/CapabilitiesMarquee";
 import StatusStrip from "@/components/StatusStrip";
 import RecognitionStrip from "@/components/RecognitionStrip";
 import SelectedWork from "@/components/SelectedWork";
+import ScrollCanvas, { ScrollOverlaySection } from "@/components/ScrollCanvas";
 
 const CAL_LINK = "https://cal.com/sheenhaus/intro";
 const MAIL_LINK = "mailto:hello@sheenhaus.com";
@@ -112,6 +113,26 @@ const FAQS = [
     a: "You work directly with the people who build your site — not a salesperson who hands you to a junior team. Large agencies charge $30K to $100K and pass your project through five departments. We deliver the same quality faster, at a fraction of the cost.",
   },
 ];
+
+/* ─── Hero scroll cue — fades out as the user starts scrolling ─── */
+function ScrollCue({
+  scrollYProgress,
+}: {
+  scrollYProgress: MotionValue<number>;
+}) {
+  const opacity = useTransform(scrollYProgress, [0, 0.05, 0.1], [1, 0.5, 0]);
+  return (
+    <motion.div
+      style={{ opacity }}
+      className="absolute bottom-8 right-8 z-10 hidden md:flex items-center gap-3 pointer-events-none"
+    >
+      <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-text-faint">
+        Scroll
+      </span>
+      <span className="w-px h-10 block bg-text-faint" />
+    </motion.div>
+  );
+}
 
 /* ─── Live clock + Studio status ─── */
 function LiveClock() {
@@ -225,130 +246,105 @@ export default function Home() {
       <div className="fixed top-[-300px] right-[-200px] w-[900px] h-[900px] rounded-full bg-[radial-gradient(circle,rgba(138,106,53,0.08)_0%,transparent_60%)] pointer-events-none z-0" />
       <div className="fixed bottom-[-400px] left-[-300px] w-[800px] h-[800px] rounded-full bg-[radial-gradient(circle,rgba(45,74,58,0.06)_0%,transparent_60%)] pointer-events-none z-0" />
 
-      {/* HERO — cream-on-cream, CSS-only cinematic canvas. No photograph.
-          Warm bronze ambient orb behind the H1, layered gradient sheen,
-          subtle grain. The headline sits on a calm field, the way Aesop
-          and Loro Piana stage their landing copy. */}
-      <section className="relative z-10 w-full h-[100svh] min-h-[680px] overflow-hidden">
-        {/* Warm radial — soft bronze glow centred behind the H1 */}
-        <div
-          aria-hidden="true"
-          className="absolute pointer-events-none"
-          style={{
-            top: "20%",
-            left: "10%",
-            width: "70vw",
-            height: "70vw",
-            background:
-              "radial-gradient(circle, rgba(201,169,110,0.18) 0%, rgba(201,169,110,0.08) 30%, transparent 65%)",
-            filter: "blur(20px)",
-          }}
-        />
+      {/* HERO — scroll-pinned canvas. A bronze sculptural ring rotates as
+          the user scrolls. Text overlays fade in/out at scroll thresholds.
+          400vh outer = ~4 viewports of scrub before releasing into the page. */}
+      <ScrollCanvas scrollHeight="400vh">
+        {(scrollYProgress) => (
+          <>
+            {/* Eyebrow + headline — visible 0%–35% of the canvas scroll */}
+            <ScrollOverlaySection
+              scrollYProgress={scrollYProgress}
+              start={0.02}
+              end={0.32}
+              align="left"
+            >
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1.2, delay: 0.9, ease: [0.2, 0.7, 0.2, 1] }}
+              >
+                <div className="inline-flex items-center gap-3">
+                  <span className="w-6 h-px bg-accent" />
+                  <span className="font-mono text-[12px] uppercase tracking-[0.22em] text-text-mid whitespace-nowrap">
+                    A Digital Studio · Est. 2026
+                  </span>
+                </div>
+              </motion.div>
 
-        {/* Secondary deep forest accent — far right, very quiet */}
-        <div
-          aria-hidden="true"
-          className="absolute pointer-events-none"
-          style={{
-            top: "-10%",
-            right: "-10%",
-            width: "50vw",
-            height: "50vw",
-            background:
-              "radial-gradient(circle, rgba(45,74,58,0.08) 0%, transparent 60%)",
-            filter: "blur(20px)",
-          }}
-        />
+              <motion.h1
+                className="display-serif font-serif text-text text-[clamp(3rem,9vw,8rem)] leading-[1.02] tracking-[-0.035em] mt-8 max-w-[18ch] pb-2"
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1.4, delay: 1.0, ease: [0.2, 0.7, 0.2, 1] }}
+              >
+                We craft the digital presence of{" "}
+                <em className="italic-accent shine">premium</em> brands.
+              </motion.h1>
 
-        {/* Diagonal sheen — barely-there warm gradient pass */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              "linear-gradient(135deg, rgba(244,239,230,0) 0%, rgba(232,213,179,0.18) 50%, rgba(244,239,230,0) 100%)",
-          }}
-        />
+              <motion.p
+                className="font-mono text-[11px] uppercase tracking-[0.22em] text-text-faint mt-10"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1.0, delay: 1.4 }}
+              >
+                Scroll to begin →
+              </motion.p>
+            </ScrollOverlaySection>
 
-        {/* Film grain */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 mix-blend-multiply opacity-50 pointer-events-none"
-          style={{
-            backgroundImage:
-              "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.92' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.4'/%3E%3C/svg%3E\")",
-          }}
-        />
+            {/* Middle moment — positioning statement, italic-serif */}
+            <ScrollOverlaySection
+              scrollYProgress={scrollYProgress}
+              start={0.4}
+              end={0.65}
+              align="center"
+            >
+              <p className="font-serif italic-accent text-text text-[clamp(2rem,5vw,4rem)] leading-[1.15] tracking-[-0.025em] max-w-[20ch] mx-auto">
+                For brands whose offline work
+                <br />
+                already speaks for itself.
+              </p>
+            </ScrollOverlaySection>
 
-        {/* Subtle bottom vignette — anchors composition without darkening */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-x-0 bottom-0 h-1/3 pointer-events-none"
-          style={{
-            background:
-              "linear-gradient(to top, rgba(138,106,53,0.06) 0%, rgba(138,106,53,0) 100%)",
-          }}
-        />
-
-        {/* Content — bottom-left, like a film poster */}
-        <div className="absolute inset-0 z-10 shell flex flex-col justify-end pb-16 md:pb-24">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.2, delay: 0.9, ease: [0.2, 0.7, 0.2, 1] }}
-          >
-            <div className="inline-flex items-center gap-3">
-              <span className="w-6 h-px bg-accent" />
-              <span className="font-mono text-[12px] uppercase tracking-[0.22em] text-text-mid whitespace-nowrap">
-                A Digital Studio · Est. 2026
+            {/* Final moment — CTAs */}
+            <ScrollOverlaySection
+              scrollYProgress={scrollYProgress}
+              start={0.72}
+              end={0.98}
+              align="left"
+            >
+              <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-text-mid">
+                Accepting briefs · 2026
               </span>
-            </div>
-          </motion.div>
+              <h2 className="display-serif font-serif text-text text-[clamp(2.5rem,7vw,6rem)] leading-[1.04] tracking-[-0.03em] mt-6 max-w-[18ch]">
+                Begin with a <em className="italic-accent">conversation.</em>
+              </h2>
+              <div className="flex flex-col sm:flex-row gap-5 mt-10">
+                <a
+                  href={CAL_LINK}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-cursor="cta"
+                  data-cursor-text="Schedule"
+                  className="btn-bronze"
+                >
+                  Book a call <span aria-hidden>→</span>
+                </a>
+                <a
+                  href="#work"
+                  data-cursor="hover"
+                  className="btn-ghost"
+                >
+                  View the work <span aria-hidden>↓</span>
+                </a>
+              </div>
+            </ScrollOverlaySection>
 
-          <motion.h1
-            className="display-serif font-serif text-text text-[clamp(3rem,9vw,8rem)] leading-[1.02] tracking-[-0.035em] mt-8 max-w-[18ch] pb-2"
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.4, delay: 1.0, ease: [0.2, 0.7, 0.2, 1] }}
-          >
-            We craft the digital presence of{" "}
-            <em className="italic-accent shine">premium</em> brands.
-          </motion.h1>
-
-          <motion.div
-            className="flex flex-col sm:flex-row gap-5 mt-12"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.0, delay: 1.3, ease: [0.2, 0.7, 0.2, 1] }}
-          >
-            <a
-              href={CAL_LINK}
-              target="_blank"
-              rel="noopener noreferrer"
-              data-cursor="cta"
-              data-cursor-text="Schedule"
-              className="btn-bronze"
-            >
-              Book a call <span aria-hidden>→</span>
-            </a>
-            <a
-              href="#work"
-              data-cursor="hover"
-              className="btn-ghost"
-            >
-              View the work <span aria-hidden>↓</span>
-            </a>
-          </motion.div>
-        </div>
-
-        {/* Scroll cue — bottom-right, very quiet */}
-        <div className="absolute bottom-8 right-8 z-10 hidden md:flex items-center gap-3 pointer-events-none">
-          <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-text-faint">
-            Scroll
-          </span>
-          <span className="w-px h-10 block bg-text-faint" />
-        </div>
-      </section>
+            {/* Scroll cue — bottom-right, fades out as user starts scrolling */}
+            <ScrollCue scrollYProgress={scrollYProgress} />
+          </>
+        )}
+      </ScrollCanvas>
 
       {/* STATUS STRIP */}
       <section className="relative z-10 shell mt-16">

@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "sequence:generate": "node scripts/generate-sequence.mjs",
+    "sequence:bake": "node scripts/bake-sequence.mjs"
   },
   "dependencies": {
     "@fontsource/instrument-serif": "^5.2.8",
