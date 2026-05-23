@@ -243,7 +243,6 @@ function FilterChip({
   return (
     <button
       onClick={onClick}
-      data-cursor="hover"
       className={`font-mono text-[11px] uppercase tracking-[0.18em] transition-colors duration-500 ${
         active
           ? "text-accent"

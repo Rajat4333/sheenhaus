@@ -1,7 +1,6 @@
 "use client";
-import { useEffect, useState } from "react";
-import { motion, useTransform, type MotionValue } from "framer-motion";
-import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import RevealOnScroll from "@/components/RevealOnScroll";
@@ -9,9 +8,12 @@ import CapabilitiesMarquee from "@/components/CapabilitiesMarquee";
 import StatusStrip from "@/components/StatusStrip";
 import RecognitionStrip from "@/components/RecognitionStrip";
 import SelectedWork from "@/components/SelectedWork";
-import ScrollCanvas, { ScrollOverlaySection } from "@/components/ScrollCanvas";
+import ScrollSentence from "@/components/ScrollSentence";
+import HeroScroll, { HeroMoment } from "@/components/HeroScroll";
+import VerdictReveal from "@/components/VerdictReveal";
+import HoverImage from "@/components/HoverImage";
 
-const CAL_LINK = "https://cal.com/sheenhaus/intro";
+const CAL_LINK = "https://cal.com/sheenhaus-yseo4c";
 const MAIL_LINK = "mailto:hello@sheenhaus.com";
 const INSTAGRAM_LINK = "https://www.instagram.com/sheenhaus_/";
 
@@ -40,21 +42,29 @@ const VERTICALS = [
     title: "Jewellery & luxury retail",
     desc: "Your showroom costs crores. Your website was built by your POS vendor. Clients choose competitors whose site feels more considered than yours.",
     thesis: "slowness",
+    image:
+      "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=900&q=85&auto=format&fit=crop",
   },
   {
     title: "Real estate & developers",
     desc: "You sell premium properties. Your website has popup ads, stock photography, and auto-playing videos. Buyers judge the project by the website first.",
     thesis: "considered-detail",
+    image:
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=900&q=85&auto=format&fit=crop",
   },
   {
     title: "Hospitality & hotels",
     desc: "Guests pay premium for the experience. Your website should give them a taste before they book — not a CMS template with blurry photos.",
     thesis: "slowness",
+    image:
+      "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=900&q=85&auto=format&fit=crop",
   },
   {
     title: "Private healthcare",
     desc: "Patients compare providers online before choosing. If your site looks like a government portal, they pick the practice that inspires confidence.",
     thesis: "trust-through-restraint",
+    image:
+      "https://images.unsplash.com/photo-1631815587646-b85a1bb027e1?w=900&q=85&auto=format&fit=crop",
   },
 ];
 
@@ -113,26 +123,6 @@ const FAQS = [
     a: "You work directly with the people who build your site — not a salesperson who hands you to a junior team. Large agencies charge $30K to $100K and pass your project through five departments. We deliver the same quality faster, at a fraction of the cost.",
   },
 ];
-
-/* ─── Hero scroll cue — fades out as the user starts scrolling ─── */
-function ScrollCue({
-  scrollYProgress,
-}: {
-  scrollYProgress: MotionValue<number>;
-}) {
-  const opacity = useTransform(scrollYProgress, [0, 0.05, 0.1], [1, 0.5, 0]);
-  return (
-    <motion.div
-      style={{ opacity }}
-      className="absolute bottom-8 right-8 z-10 hidden md:flex items-center gap-3 pointer-events-none"
-    >
-      <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-text-faint">
-        Scroll
-      </span>
-      <span className="w-px h-10 block bg-text-faint" />
-    </motion.div>
-  );
-}
 
 /* ─── Live clock + Studio status ─── */
 function LiveClock() {
@@ -197,7 +187,6 @@ function FAQItem({ q, a }: { q: string; a: string }) {
       <button
         className="w-full flex justify-between items-baseline gap-8 py-7 text-left group"
         onClick={() => setOpen(!open)}
-        data-cursor="hover"
       >
         <span className="font-serif text-xl md:text-2xl text-text group-hover:text-accent transition-colors duration-500 leading-tight">
           {q}
@@ -236,6 +225,74 @@ function Tag({ label }: { label: string }) {
   );
 }
 
+/* ─── Vertical card — one of the four "Who This Is For" tiles ───
+   Each card owns its own ref so HoverImage can subscribe to its
+   pointer events and reveal a cursor-anchored image plate on
+   first hover. */
+function VerticalCard({
+  v,
+  i,
+  isLeftCol,
+}: {
+  v: (typeof VERTICALS)[number];
+  i: number;
+  isLeftCol: boolean;
+}) {
+  const cardRef = useRef<HTMLAnchorElement>(null);
+  return (
+    <>
+      <Link
+        ref={cardRef}
+        href={`/concepts#${v.thesis}`}
+        className={`vertical-card group relative block border-b border-border pt-14 pb-20 px-2 ${
+          isLeftCol
+            ? "md:pr-10 md:border-r md:border-border"
+            : "md:pl-10"
+        }`}
+      >
+        {/* Header row — title left, faint numeral right */}
+        <div className="flex items-start justify-between gap-6">
+          <h3 className="font-serif text-2xl md:text-3xl leading-tight tracking-tight max-w-[14ch] transition-colors duration-700 group-hover:text-accent">
+            {v.title}
+          </h3>
+          <span className="vertical-card-num font-mono text-[10px] tracking-[0.22em] text-text-faint pt-2 flex-shrink-0 transition-all duration-700 group-hover:text-accent">
+            {String(i + 1).padStart(2, "0")}
+          </span>
+        </div>
+        <p className="text-[15px] text-text-mid leading-[1.8] mt-6 max-w-md transition-colors duration-700 group-hover:text-text">
+          {v.desc}
+        </p>
+
+        {/* Hover sweep line — bronze rule along the top edge */}
+        <span
+          aria-hidden="true"
+          className="vertical-card-sweep pointer-events-none absolute top-0 left-0 right-0 h-px origin-left scale-x-0 transition-transform duration-[900ms] ease-[cubic-bezier(0.2,0.7,0.2,1)] group-hover:scale-x-100"
+          style={{
+            background:
+              "linear-gradient(90deg, transparent 0%, #8a6a35 35%, #c9a96e 50%, #8a6a35 65%, transparent 100%)",
+          }}
+        />
+
+        {/* Hover read-more cue, bottom-left */}
+        <span
+          aria-hidden="true"
+          className="absolute left-2 md:left-0 bottom-5 inline-flex items-center gap-3 opacity-0 -translate-x-2 transition-all duration-700 ease-[cubic-bezier(0.2,0.7,0.2,1)] group-hover:opacity-100 group-hover:translate-x-0"
+        >
+          <span className="w-5 h-px bg-accent" />
+          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-accent">
+            Read the thesis →
+          </span>
+        </span>
+      </Link>
+
+      {/* Cursor-anchored image plate — fades in on first hover,
+          follows the cursor with smoothed spring easing, fades
+          out on leave. Desktop only. */}
+      <HoverImage src={v.image} alt="" parentRef={cardRef} />
+    </>
+  );
+}
+
 /* ─── MAIN PAGE ─── */
 export default function Home() {
   return (
@@ -246,23 +303,31 @@ export default function Home() {
       <div className="fixed top-[-300px] right-[-200px] w-[900px] h-[900px] rounded-full bg-[radial-gradient(circle,rgba(138,106,53,0.08)_0%,transparent_60%)] pointer-events-none z-0" />
       <div className="fixed bottom-[-400px] left-[-300px] w-[800px] h-[800px] rounded-full bg-[radial-gradient(circle,rgba(45,74,58,0.06)_0%,transparent_60%)] pointer-events-none z-0" />
 
-      {/* HERO — scroll-pinned canvas. A bronze sculptural ring rotates as
-          the user scrolls. Text overlays fade in/out at scroll thresholds.
-          400vh outer = ~4 viewports of scrub before releasing into the page. */}
-      <ScrollCanvas scrollHeight="400vh">
+      {/* HERO — three scroll-directed editorial moments inside one
+          sticky viewport. Visitor scrolls through ~3 viewports of
+          held silence; moments cross-fade in sequence with a subtle
+          y-parallax. No canvas, no frames, no Three.js. */}
+      <HeroScroll>
         {(scrollYProgress) => (
           <>
-            {/* Eyebrow + headline — visible 0%–35% of the canvas scroll */}
-            <ScrollOverlaySection
+            {/* Moment 1 — opener (0–35%). Single coordinated reveal:
+                eyebrow → headline → hairline draws across → scroll cue.
+                Lands within ~1.2s of first paint so the page never
+                reads as blank cream. */}
+            <HeroMoment
               scrollYProgress={scrollYProgress}
-              start={0.02}
+              start={0.0}
               end={0.32}
               align="left"
             >
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1.2, delay: 0.9, ease: [0.2, 0.7, 0.2, 1] }}
+                transition={{
+                  duration: 0.9,
+                  delay: 0.15,
+                  ease: [0.2, 0.7, 0.2, 1],
+                }}
               >
                 <div className="inline-flex items-center gap-3">
                   <span className="w-6 h-px bg-accent" />
@@ -274,29 +339,76 @@ export default function Home() {
 
               <motion.h1
                 className="display-serif font-serif text-text text-[clamp(3rem,9vw,8rem)] leading-[1.02] tracking-[-0.035em] mt-8 max-w-[18ch] pb-2"
-                initial={{ opacity: 0, y: 40 }}
+                initial={{ opacity: 0, y: 28 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1.4, delay: 1.0, ease: [0.2, 0.7, 0.2, 1] }}
+                transition={{
+                  duration: 1.1,
+                  delay: 0.3,
+                  ease: [0.2, 0.7, 0.2, 1],
+                }}
               >
                 We craft the digital presence of{" "}
                 <em className="italic-accent shine">premium</em> brands.
               </motion.h1>
 
-              <motion.p
-                className="font-mono text-[11px] uppercase tracking-[0.22em] text-text-faint mt-10"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 1.0, delay: 1.4 }}
-              >
-                Scroll to begin →
-              </motion.p>
-            </ScrollOverlaySection>
+              {/* Bronze hairline rule — draws itself across the page
+                  below the headline. Quiet but unmistakably *premium*:
+                  the kind of detail Aesop and Aman use to signal that
+                  the page is active without adding visual noise. */}
+              <motion.div
+                aria-hidden="true"
+                className="mt-12 h-px origin-left"
+                style={{
+                  background:
+                    "linear-gradient(90deg, transparent 0%, rgba(138,106,53,0.5) 20%, #8a6a35 50%, rgba(138,106,53,0.5) 80%, transparent 100%)",
+                }}
+                initial={{ scaleX: 0, opacity: 0 }}
+                animate={{ scaleX: 1, opacity: 1 }}
+                transition={{
+                  scaleX: { duration: 1.6, delay: 0.9, ease: [0.2, 0.7, 0.2, 1] },
+                  opacity: { duration: 0.6, delay: 0.9 },
+                }}
+              />
 
-            {/* Middle moment — positioning statement, italic-serif */}
-            <ScrollOverlaySection
+              {/* Two-column meta row: live scroll cue on the left,
+                  the studio's quiet status on the right. Gives the
+                  first paint *content* in the lower half of the
+                  viewport so it never reads as empty. */}
+              <motion.div
+                className="flex items-center justify-between mt-8 gap-8 max-w-[42rem]"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.9,
+                  delay: 1.2,
+                  ease: [0.2, 0.7, 0.2, 1],
+                }}
+              >
+                <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-text-faint inline-flex items-center gap-3">
+                  <motion.span
+                    aria-hidden="true"
+                    className="block w-px h-6 bg-accent"
+                    animate={{ opacity: [0.3, 1, 0.3] }}
+                    transition={{
+                      duration: 2.4,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                  />
+                  Scroll to begin
+                </span>
+                <span className="hidden sm:inline-flex font-mono text-[10px] uppercase tracking-[0.22em] text-text-faint items-center gap-2.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse-slow" />
+                  Accepting briefs · 2026
+                </span>
+              </motion.div>
+            </HeroMoment>
+
+            {/* Moment 2 — positioning, italic, centered (38–62%) */}
+            <HeroMoment
               scrollYProgress={scrollYProgress}
-              start={0.4}
-              end={0.65}
+              start={0.38}
+              end={0.62}
               align="center"
             >
               <p className="font-serif italic-accent text-text text-[clamp(2rem,5vw,4rem)] leading-[1.15] tracking-[-0.025em] max-w-[20ch] mx-auto">
@@ -304,12 +416,12 @@ export default function Home() {
                 <br />
                 already speaks for itself.
               </p>
-            </ScrollOverlaySection>
+            </HeroMoment>
 
-            {/* Final moment — CTAs */}
-            <ScrollOverlaySection
+            {/* Moment 3 — invitation + CTAs (68–98%) */}
+            <HeroMoment
               scrollYProgress={scrollYProgress}
-              start={0.72}
+              start={0.68}
               end={0.98}
               align="left"
             >
@@ -317,34 +429,29 @@ export default function Home() {
                 Accepting briefs · 2026
               </span>
               <h2 className="display-serif font-serif text-text text-[clamp(2.5rem,7vw,6rem)] leading-[1.04] tracking-[-0.03em] mt-6 max-w-[18ch]">
-                Begin with a <em className="italic-accent">conversation.</em>
+                Begin with a{" "}
+                <em className="italic-accent">conversation.</em>
               </h2>
-              <div className="flex flex-col sm:flex-row gap-5 mt-10">
+              <div className="flex flex-col sm:flex-row flex-wrap gap-5 mt-10">
+                <Link href="/audit" className="btn-bronze">
+                  Audit your site <span aria-hidden>→</span>
+                </Link>
                 <a
                   href={CAL_LINK}
                   target="_blank"
                   rel="noopener noreferrer"
-                  data-cursor="cta"
-                  data-cursor-text="Schedule"
-                  className="btn-bronze"
+                  className="btn-ghost"
                 >
                   Book a call <span aria-hidden>→</span>
                 </a>
-                <a
-                  href="#work"
-                  data-cursor="hover"
-                  className="btn-ghost"
-                >
+                <a href="#work" className="btn-ghost">
                   View the work <span aria-hidden>↓</span>
                 </a>
               </div>
-            </ScrollOverlaySection>
-
-            {/* Scroll cue — bottom-right, fades out as user starts scrolling */}
-            <ScrollCue scrollYProgress={scrollYProgress} />
+            </HeroMoment>
           </>
         )}
-      </ScrollCanvas>
+      </HeroScroll>
 
       {/* STATUS STRIP */}
       <section className="relative z-10 shell mt-16">
@@ -355,6 +462,39 @@ export default function Home() {
       <section className="relative z-10 mt-28">
         <CapabilitiesMarquee />
       </section>
+
+      {/* ═══════════ HELD BEAT ═══════════
+          Scroll-directed sentence: one held moment between the
+          marquee's motion and the Principles section. The whole
+          sentence resolves as the visitor scrolls through ~180vh —
+          the cinematic move here is restraint, not spectacle. */}
+      <ScrollSentence
+        eyebrow="A note from the studio"
+        words={[
+          { text: "Most" },
+          { text: "of" },
+          { text: "what" },
+          { text: "passes" },
+          { text: "for" },
+          { text: "premium" },
+          { text: "online" },
+          { text: "is" },
+          { text: "just" },
+          { text: "expensive" },
+          { text: "in" },
+          { text: "a" },
+          { text: "hurry." },
+          { text: "We" },
+          { text: "build" },
+          { text: "sites" },
+          { text: "that" },
+          { text: "earn" },
+          { text: "the" },
+          { text: "silence", italic: true },
+          { text: "around", italic: true },
+          { text: "them.", italic: true },
+        ]}
+      />
 
       {/* ═══════════ PRINCIPLES ═══════════ */}
       <section className="relative z-10 shell pt-24">
@@ -375,64 +515,33 @@ export default function Home() {
       <section className="relative z-10 shell section-pad">
         <RevealOnScroll>
           <Tag label="Who This Is For" />
-          <h2 className="display-serif font-serif text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.04] tracking-[-0.03em] mt-8 max-w-[20ch]">
-            You have built something{" "}
-            <em className="italic-accent">remarkable.</em> Your website does not
-            show it.
-          </h2>
         </RevealOnScroll>
+        <VerdictReveal
+          className="display-serif font-serif text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.04] tracking-[-0.03em] mt-8 max-w-[20ch] block"
+          words={[
+            { text: "You" },
+            { text: "have" },
+            { text: "built" },
+            { text: "something" },
+            { text: "remarkable.", italic: true },
+            { text: "Your" },
+            { text: "website" },
+            { text: "does" },
+            { text: "not" },
+            { text: "show" },
+            { text: "it." },
+          ]}
+        />
 
         <div className="grid md:grid-cols-2 mt-24 border-t border-border">
-          {VERTICALS.map((v, i) => {
-            const isLeftCol = i % 2 === 0;
-            return (
-              <Link
-                key={v.title}
-                href={`/concepts#${v.thesis}`}
-                data-cursor="cta"
-                data-cursor-text="Read"
-                className={`vertical-card group relative block border-b border-border pt-14 pb-20 px-2 ${
-                  isLeftCol
-                    ? "md:pr-10 md:border-r md:border-border"
-                    : "md:pl-10"
-                }`}
-              >
-                {/* Header row — title left, faint numeral right */}
-                <div className="flex items-start justify-between gap-6">
-                  <h3 className="font-serif text-2xl md:text-3xl leading-tight tracking-tight max-w-[14ch] transition-colors duration-700 group-hover:text-accent">
-                    {v.title}
-                  </h3>
-                  <span className="vertical-card-num font-mono text-[10px] tracking-[0.22em] text-text-faint pt-2 flex-shrink-0 transition-all duration-700 group-hover:text-accent">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                </div>
-                <p className="text-[15px] text-text-mid leading-[1.8] mt-6 max-w-md transition-colors duration-700 group-hover:text-text">
-                  {v.desc}
-                </p>
-
-                {/* Hover sweep line — bronze rule along the top edge */}
-                <span
-                  aria-hidden="true"
-                  className="vertical-card-sweep pointer-events-none absolute top-0 left-0 right-0 h-px origin-left scale-x-0 transition-transform duration-[900ms] ease-[cubic-bezier(0.2,0.7,0.2,1)] group-hover:scale-x-100"
-                  style={{
-                    background:
-                      "linear-gradient(90deg, transparent 0%, #8a6a35 35%, #c9a96e 50%, #8a6a35 65%, transparent 100%)",
-                  }}
-                />
-
-                {/* Hover read-more cue, bottom-left */}
-                <span
-                  aria-hidden="true"
-                  className="absolute left-2 md:left-0 bottom-5 inline-flex items-center gap-3 opacity-0 -translate-x-2 transition-all duration-700 ease-[cubic-bezier(0.2,0.7,0.2,1)] group-hover:opacity-100 group-hover:translate-x-0"
-                >
-                  <span className="w-5 h-px bg-accent" />
-                  <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-accent">
-                    Read the thesis →
-                  </span>
-                </span>
-              </Link>
-            );
-          })}
+          {VERTICALS.map((v, i) => (
+            <VerticalCard
+              key={v.title}
+              v={v}
+              i={i}
+              isLeftCol={i % 2 === 0}
+            />
+          ))}
         </div>
       </section>
 
@@ -440,7 +549,41 @@ export default function Home() {
         <div className="hairline" />
       </div>
 
-      {/* ═══════════ SERVICES ═══════════ */}
+      {/* DIAGNOSTIC CTA — bridges 'Who This Is For' to 'Services' with
+          a soft-sell into the long-form /signs essay. Editorial moment,
+          not a banner. */}
+      <section className="relative z-10 shell section-pad">
+        <RevealOnScroll>
+          <div className="grid lg:grid-cols-[1fr_auto] gap-12 lg:gap-20 items-end">
+            <div>
+              <Tag label="A Diagnostic" />
+              <h2 className="display-serif font-serif text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.04] tracking-[-0.03em] mt-8 max-w-[22ch]">
+                Twelve <em className="italic-accent">signs</em> your website is
+                costing you clients.
+              </h2>
+              <p className="text-text-mid text-[17px] max-w-2xl mt-10 leading-[1.8]">
+                A quiet read for any premium business whose offline brand
+                already outruns its digital presence. Tick the patterns that
+                apply to your own site &mdash; popup discounts, stock
+                photography, ERP-vendor headers, AI invisibility &mdash; and
+                you have a brief.
+              </p>
+            </div>
+            <Link
+              href="/signs"
+              className="btn-bronze self-start lg:self-end whitespace-nowrap"
+            >
+              Read the diagnostic <span aria-hidden>&rarr;</span>
+            </Link>
+          </div>
+        </RevealOnScroll>
+      </section>
+
+      <div className="shell">
+        <div className="hairline" />
+      </div>
+
+      {/* SERVICES */}
       <section id="services" className="relative z-10 shell section-pad">
         <RevealOnScroll>
           <Tag label="What We Do" />
@@ -468,63 +611,6 @@ export default function Home() {
               </p>
             </div>
           ))}
-        </div>
-      </section>
-
-      {/* EDITORIAL PHOTO ANCHOR — real cinematic photograph, treated */}
-      <section className="relative z-10 mt-16 mb-16 shell">
-        <div
-          className="relative w-full aspect-[21/9] md:aspect-[21/8] overflow-hidden rounded-sm"
-          style={{ boxShadow: "0 30px 80px -20px rgba(26, 22, 18, 0.18)" }}
-        >
-          <Image
-            src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=2400&q=85&auto=format&fit=crop"
-            alt=""
-            fill
-            sizes="100vw"
-            className="object-cover"
-            style={{
-              filter: "grayscale(0.45) contrast(1.1) brightness(0.7)",
-            }}
-          />
-          {/* Warm bronze wash binds the photo into the page palette */}
-          <div
-            className="absolute inset-0 mix-blend-multiply pointer-events-none"
-            style={{
-              background:
-                "linear-gradient(135deg, rgba(20,17,14,0.35) 0%, rgba(74,53,32,0.25) 100%)",
-            }}
-          />
-          {/* Film grain */}
-          <div
-            className="absolute inset-0 mix-blend-overlay opacity-30 pointer-events-none"
-            style={{
-              backgroundImage:
-                "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.92' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.5'/%3E%3C/svg%3E\")",
-            }}
-          />
-          {/* Bottom anchor gradient */}
-          <div
-            className="absolute inset-x-0 bottom-0 h-2/3 pointer-events-none"
-            style={{
-              background:
-                "linear-gradient(to top, rgba(20,17,14,0.85) 0%, rgba(20,17,14,0) 100%)",
-            }}
-          />
-          <div className="absolute inset-0 flex items-end">
-            <div className="w-full px-10 md:px-20 pb-14 md:pb-20">
-              <span className="font-mono text-[11px] uppercase tracking-[0.22em]" style={{ color: "#c9a96e" }}>
-                — From the studio
-              </span>
-              <p className="font-serif italic-accent text-[clamp(1.75rem,3.8vw,2.75rem)] leading-[1.4] tracking-[-0.015em] mt-8 max-w-2xl" style={{ color: "#f0ebe0" }}>
-                Decades building the brand offline.
-                <br />
-                Three weeks building it online.
-                <br />
-                We close that gap.
-              </p>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -747,15 +833,12 @@ export default function Home() {
             href={CAL_LINK}
             target="_blank"
             rel="noopener noreferrer"
-            data-cursor="cta"
-            data-cursor-text="Schedule"
             className="btn-bronze"
           >
             Book a call <span aria-hidden>→</span>
           </a>
           <a
             href={MAIL_LINK}
-            data-cursor="hover"
             data-link-style="bronze"
             className="font-mono text-[11px] uppercase tracking-[0.22em] text-text-dim"
           >
@@ -792,7 +875,6 @@ export default function Home() {
               <div className="flex flex-col gap-3 mt-4">
                 <a
                   href={MAIL_LINK}
-                  data-cursor="hover"
                   data-link-style="bronze"
                   className="text-text text-sm"
                 >
@@ -802,7 +884,6 @@ export default function Home() {
                   href={CAL_LINK}
                   target="_blank"
                   rel="noopener noreferrer"
-                  data-cursor="hover"
                   className="text-text-mid text-sm hover:text-accent transition-colors duration-500"
                 >
                   Book a call →
@@ -811,7 +892,6 @@ export default function Home() {
                   href={INSTAGRAM_LINK}
                   target="_blank"
                   rel="noopener noreferrer"
-                  data-cursor="hover"
                   className="text-text-mid text-sm hover:text-accent transition-colors duration-500"
                 >
                   Instagram →
@@ -826,13 +906,14 @@ export default function Home() {
                 {[
                   { label: "Work", href: "#work" },
                   { label: "Studio", href: "#studio" },
+                  { label: "Audit", href: "/audit" },
+                  { label: "Diagnostic", href: "/signs" },
                   { label: "FAQ", href: "#faq" },
                   { label: "Contact", href: "#contact" },
                 ].map((l) => (
                   <a
                     key={l.label}
                     href={l.href}
-                    data-cursor="hover"
                     className="text-text-mid text-sm hover:text-accent transition-colors duration-500"
                   >
                     {l.label}

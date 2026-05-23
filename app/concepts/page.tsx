@@ -3,7 +3,7 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import ThesesView from "./ThesesView";
 
-const CAL_LINK = "https://cal.com/sheenhaus/intro";
+const CAL_LINK = "https://cal.com/sheenhaus-yseo4c";
 
 export default function ConceptsPage() {
   return (
@@ -63,15 +63,12 @@ export default function ConceptsPage() {
             href={CAL_LINK}
             target="_blank"
             rel="noopener noreferrer"
-            data-cursor="cta"
-            data-cursor-text="Schedule"
             className="btn-bronze"
           >
             Book a call <span aria-hidden>→</span>
           </a>
           <Link
             href="/"
-            data-cursor="hover"
             data-link-style="bronze"
             className="font-mono text-[11px] uppercase tracking-[0.22em] text-text-dim"
           >

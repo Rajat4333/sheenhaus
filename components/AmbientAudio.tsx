@@ -65,7 +65,6 @@ export default function AmbientAudio() {
     <button
       onClick={toggle}
       aria-label={playing ? "Mute studio ambience" : "Play studio ambience"}
-      data-cursor="hover"
       className="fixed bottom-6 left-6 z-30 group inline-flex items-center gap-3 px-3 py-2 rounded-full transition-colors duration-500"
       style={{
         background: "rgba(26, 22, 18, 0.04)",

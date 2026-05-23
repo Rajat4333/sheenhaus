@@ -27,7 +27,6 @@ export default function CapabilitiesMarquee() {
           <Link
             key={`${c.label}-${i}`}
             href={c.craft ? `/concepts?craft=${c.craft}` : "/concepts"}
-            data-cursor="hover"
             className="flex items-center font-serif text-[clamp(2.5rem,6vw,5rem)] leading-none tracking-tight text-text px-8 whitespace-nowrap transition-colors duration-500 hover:text-accent"
           >
             <em className="italic-accent">{c.label}</em>

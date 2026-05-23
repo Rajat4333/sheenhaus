@@ -3,7 +3,6 @@ import { Instrument_Serif, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
 import PageVeil from "@/components/PageVeil";
-import CursorGlow from "@/components/CursorGlow";
 import AfterHours from "@/components/AfterHours";
 import AmbientAudio from "@/components/AmbientAudio";
 import FaviconSwitcher from "@/components/FaviconSwitcher";
@@ -56,7 +55,6 @@ export default function RootLayout({
       <body className="overflow-x-hidden">
         <PageVeil />
         <SmoothScroll />
-        <CursorGlow />
         <AfterHours />
         <AmbientAudio />
         <FaviconSwitcher />

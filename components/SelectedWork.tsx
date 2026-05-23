@@ -127,8 +127,6 @@ export default function SelectedWork() {
             className="work-row group"
             onMouseEnter={() => setActive(t)}
             onMouseLeave={() => setActive(null)}
-            data-cursor="cta"
-            data-cursor-text="Read"
           >
             <span
               className="font-mono text-[11px] uppercase tracking-[0.18em] text-text-dim"

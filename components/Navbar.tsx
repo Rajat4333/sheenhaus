@@ -4,12 +4,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 
 const NAV_LINKS = [
-  { href: "#work", label: "Work" },
-  { href: "#studio", label: "Studio" },
-  { href: "#contact", label: "Contact" },
+  { href: "/#work", label: "Work" },
+  { href: "/#studio", label: "Studio" },
+  { href: "/#contact", label: "Contact" },
 ];
 
-const CAL_LINK = "https://cal.com/sheenhaus/intro";
+const CAL_LINK = "https://cal.com/sheenhaus-yseo4c";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -37,32 +37,35 @@ export default function Navbar() {
           <Link
             href="/"
             className="font-serif text-[26px] tracking-[-0.02em] text-text leading-none"
-            data-cursor="hover"
           >
             Sheenhaus
           </Link>
 
           {/* Desktop links */}
-          <div className="hidden md:flex items-center gap-12">
+          <div className="hidden md:flex items-center gap-10">
             {NAV_LINKS.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
-                data-cursor="hover"
                 className="font-mono text-[11px] uppercase tracking-[0.22em] text-text-mid hover:text-text transition-colors duration-700"
               >
                 {link.label}
               </a>
             ))}
-            <span className="hidden lg:inline-block font-mono text-[10px] uppercase tracking-[0.22em] text-text-faint pl-6 border-l border-border">
-              Accepting briefs
-            </span>
+            {/* Quiet Audit CTA — bordered pill with a live dot. Distinct
+                enough to read as an action, restrained enough not to
+                shout above the wordmark. */}
+            <Link
+              href="/audit"
+              className="group inline-flex items-center gap-2.5 px-4 py-2 rounded-full border border-accent/40 hover:border-accent text-text hover:text-accent font-mono text-[11px] uppercase tracking-[0.22em] transition-colors duration-700"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse-slow" />
+              Audit your site
+            </Link>
             <a
               href={CAL_LINK}
               target="_blank"
               rel="noopener noreferrer"
-              data-cursor="cta"
-              data-cursor-text="Schedule"
               className="font-mono text-[11px] uppercase tracking-[0.22em] text-text hover:text-accent transition-colors duration-700"
             >
               Reserve <span aria-hidden>→</span>
@@ -74,7 +77,6 @@ export default function Navbar() {
             className="md:hidden flex flex-col gap-1.5 p-2"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Toggle menu"
-            data-cursor="hover"
           >
             <motion.span
               className="w-6 h-px bg-text block"
@@ -115,15 +117,24 @@ export default function Navbar() {
                   {link.label}
                 </motion.a>
               ))}
-              <a
-                href={CAL_LINK}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-bronze mt-6 self-start"
-                onClick={() => setMobileOpen(false)}
-              >
-                Reserve
-              </a>
+              <div className="flex flex-col gap-4 mt-6">
+                <Link
+                  href="/audit"
+                  className="btn-bronze self-start"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Audit your site <span aria-hidden>→</span>
+                </Link>
+                <a
+                  href={CAL_LINK}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-ghost self-start"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Reserve
+                </a>
+              </div>
             </div>
           </motion.div>
         )}
