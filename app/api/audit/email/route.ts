@@ -64,80 +64,122 @@ function renderEmailHtml(audit: AuditPayload): string {
     }
   })();
 
+  // ─── Reusable cell — two-row structure, fixed inner heights so that
+  //    labels and numbers always sit on the same baseline regardless of
+  //    label length or number digit count. This is the spine of the
+  //    report's visual symmetry.
+  const cell = ({
+    label,
+    value,
+    accent = false,
+  }: {
+    label: string;
+    value: string | number;
+    accent?: boolean;
+  }) => `
+      <td align="center" valign="middle" style="padding:24px 8px;border:1px solid #e8e2d5;width:25%;background:#f8f4eb;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.22em;color:#8a7a5a;height:14px;line-height:14px;">${escapeHtml(label)}</div>
+        <div style="font-family:Georgia,'Instrument Serif',serif;font-size:36px;line-height:36px;height:42px;letter-spacing:-0.02em;color:${accent ? "#8a6a35" : "#1a1612"};margin-top:14px;">${value}</div>
+      </td>`;
+
+  const categoryCells = (Object.keys(audit.scores) as Category[])
+    .map((cat) =>
+      cell({
+        label: CATEGORY_LABEL[cat],
+        value: audit.scores[cat],
+        accent: audit.scores[cat] >= 70,
+      })
+    )
+    .join("");
+
   const signRows = audit.signs
     .map(
       (s) => `
       <tr>
-        <td style="padding:14px 0;border-bottom:1px solid #e8e2d5;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a7a5a;letter-spacing:0.12em;width:40px;vertical-align:top;">${s.num}</td>
-        <td style="padding:14px 0;border-bottom:1px solid #e8e2d5;font-family:Georgia,'Instrument Serif',serif;font-size:17px;color:#1a1612;line-height:1.5;">${escapeHtml(s.title)}</td>
-        <td style="padding:14px 0;border-bottom:1px solid #e8e2d5;font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.18em;color:${s.severity === "high" ? "#8a6a35" : "#6b6356"};text-align:right;vertical-align:top;">${s.severity}</td>
+        <td valign="middle" style="padding:16px 0;border-bottom:1px solid #e8e2d5;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a7a5a;letter-spacing:0.12em;width:48px;text-align:left;">${s.num}</td>
+        <td valign="middle" style="padding:16px 0;border-bottom:1px solid #e8e2d5;font-family:Georgia,'Instrument Serif',serif;font-size:17px;color:#1a1612;line-height:1.5;text-align:left;">${escapeHtml(s.title)}</td>
+        <td valign="middle" style="padding:16px 0;border-bottom:1px solid #e8e2d5;font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.18em;color:${s.severity === "high" ? "#8a6a35" : "#6b6356"};text-align:right;width:80px;">${s.severity}</td>
       </tr>`
-    )
-    .join("");
-
-  const categoryRows = (Object.keys(audit.scores) as Category[])
-    .map(
-      (cat) => `
-      <td style="padding:18px;border:1px solid #e8e2d5;width:25%;vertical-align:top;">
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.22em;color:#8a7a5a;">${CATEGORY_LABEL[cat]}</div>
-        <div style="font-family:Georgia,'Instrument Serif',serif;font-size:38px;line-height:1;margin-top:10px;color:${audit.scores[cat] >= 70 ? "#8a6a35" : "#1a1612"};">${audit.scores[cat]}</div>
-      </td>`
     )
     .join("");
 
   const lighthouseBlock = audit.pagespeed
     ? `
-    <tr>
-      <td style="padding:24px 0 0 0;">
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.22em;color:#8a7a5a;border-top:1px solid #e8e2d5;padding-top:24px;">Lighthouse · Mobile</div>
-        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top:14px;">
-          <tr>
-            <td style="font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.18em;color:#6b6356;width:25%;">Performance<br/><span style="font-family:Georgia,serif;font-size:26px;color:#1a1612;letter-spacing:0;">${audit.pagespeed.performance}</span></td>
-            <td style="font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.18em;color:#6b6356;width:25%;">Accessibility<br/><span style="font-family:Georgia,serif;font-size:26px;color:#1a1612;letter-spacing:0;">${audit.pagespeed.accessibility}</span></td>
-            <td style="font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.18em;color:#6b6356;width:25%;">SEO<br/><span style="font-family:Georgia,serif;font-size:26px;color:#1a1612;letter-spacing:0;">${audit.pagespeed.seo}</span></td>
-            <td style="font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.18em;color:#6b6356;width:25%;">Best Practices<br/><span style="font-family:Georgia,serif;font-size:26px;color:#1a1612;letter-spacing:0;">${audit.pagespeed.bestPractices}</span></td>
-          </tr>
-        </table>
-        ${audit.pagespeed.lcp != null ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.18em;color:#8a7a5a;margin-top:14px;">LCP ${(audit.pagespeed.lcp / 1000).toFixed(1)}s${audit.pagespeed.cls != null ? ` · CLS ${audit.pagespeed.cls.toFixed(3)}` : ""}${audit.pagespeed.tbt != null ? ` · TBT ${Math.round(audit.pagespeed.tbt)}ms` : ""}</div>` : ""}
-      </td>
-    </tr>`
+    <tr><td style="padding-top:48px;" align="center">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.22em;color:#8a7a5a;padding-bottom:18px;">Lighthouse · Mobile</div>
+      <table cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:separate;border-spacing:0;">
+        <tr>
+          ${cell({ label: "Performance", value: audit.pagespeed.performance, accent: audit.pagespeed.performance >= 70 })}
+          ${cell({ label: "Accessibility", value: audit.pagespeed.accessibility, accent: audit.pagespeed.accessibility >= 70 })}
+          ${cell({ label: "SEO", value: audit.pagespeed.seo, accent: audit.pagespeed.seo >= 70 })}
+          ${cell({ label: "Best Practices", value: audit.pagespeed.bestPractices, accent: audit.pagespeed.bestPractices >= 70 })}
+        </tr>
+      </table>
+      ${
+        audit.pagespeed.lcp != null
+          ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.22em;color:#8a7a5a;margin-top:18px;text-align:center;">LCP ${(audit.pagespeed.lcp / 1000).toFixed(1)}s${audit.pagespeed.cls != null ? `  ·  CLS ${audit.pagespeed.cls.toFixed(3)}` : ""}${audit.pagespeed.tbt != null ? `  ·  TBT ${Math.round(audit.pagespeed.tbt)}ms` : ""}</div>`
+          : ""
+      }
+    </td></tr>`
     : "";
 
   return `<!doctype html>
 <html>
 <body style="margin:0;padding:0;background:#f4efe6;font-family:Georgia,'Instrument Serif',serif;color:#1a1612;">
-  <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#f4efe6;padding:40px 20px;">
+  <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#f4efe6;padding:48px 20px;">
     <tr>
       <td align="center">
         <table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:620px;background:#f4efe6;">
-          <tr><td style="font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.22em;color:#8a7a5a;">— Sheenhaus · The Audit</td></tr>
-          <tr><td style="padding-top:32px;font-family:Georgia,'Instrument Serif',serif;font-size:34px;line-height:1.15;letter-spacing:-0.02em;color:#1a1612;">Your audit for <em style="color:#8a6a35;">${escapeHtml(hostname)}</em>.</td></tr>
-          <tr><td style="padding-top:40px;">
+
+          <!-- ── Eyebrow ── -->
+          <tr><td align="center" style="font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.22em;color:#8a7a5a;padding-bottom:8px;">— Sheenhaus · The Audit —</td></tr>
+
+          <!-- ── Headline ── -->
+          <tr><td align="center" style="padding-top:24px;font-family:Georgia,'Instrument Serif',serif;font-size:32px;line-height:1.2;letter-spacing:-0.02em;color:#1a1612;">Your audit for <em style="color:#8a6a35;">${escapeHtml(hostname)}</em>.</td></tr>
+
+          <!-- ── Hairline ── -->
+          <tr><td style="padding:40px 0;"><div style="height:1px;background:#e8e2d5;width:60px;margin:0 auto;"></div></td></tr>
+
+          <!-- ── Score ── -->
+          <tr><td align="center">
             <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.22em;color:#8a7a5a;">Sheenhaus Score</div>
-            <div style="font-family:Georgia,'Instrument Serif',serif;font-size:96px;line-height:1;letter-spacing:-0.04em;color:${audit.score >= 70 ? "#8a6a35" : "#1a1612"};margin-top:6px;">${audit.score}<span style="font-size:28px;color:#a8a094;"> / 100</span></div>
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.22em;color:#8a6a35;margin-top:10px;">${scoreBand(audit.score)}</div>
+            <div style="font-family:Georgia,'Instrument Serif',serif;font-size:96px;line-height:1;letter-spacing:-0.04em;color:${audit.score >= 70 ? "#8a6a35" : "#1a1612"};margin-top:12px;">${audit.score}<span style="font-size:28px;color:#a8a094;letter-spacing:0;"> / 100</span></div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.22em;color:#8a6a35;margin-top:14px;">${scoreBand(audit.score)}</div>
           </td></tr>
-          <tr><td style="padding-top:32px;">
-            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:separate;">
-              <tr>${categoryRows}</tr>
+
+          <!-- ── Category breakdown ── -->
+          <tr><td style="padding-top:48px;" align="center">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.22em;color:#8a7a5a;padding-bottom:18px;">By category</div>
+            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:separate;border-spacing:0;">
+              <tr>${categoryCells}</tr>
             </table>
           </td></tr>
+
           ${lighthouseBlock}
+
           ${
             audit.signs.length > 0
-              ? `<tr><td style="padding-top:36px;">
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.22em;color:#8a6a35;border-top:1px solid #e8e2d5;padding-top:24px;">Signs we found · ${audit.signs.length} of 12</div>
-            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top:10px;">${signRows}</table>
+              ? `<tr><td style="padding-top:48px;" align="center">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.22em;color:#8a6a35;padding-bottom:8px;">Signs we found · ${audit.signs.length} of 12</div>
+            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top:10px;border-top:1px solid #e8e2d5;">${signRows}</table>
           </td></tr>`
               : ""
           }
-          <tr><td style="padding:48px 0 0 0;border-top:1px solid #e8e2d5;margin-top:48px;">
-            <div style="font-family:Georgia,'Instrument Serif',serif;font-size:22px;line-height:1.4;color:#1a1612;font-style:italic;">Want us to walk through this with you?</div>
-            <div style="margin-top:16px;">
-              <a href="https://cal.com/sheenhaus-yseo4c" style="display:inline-block;background:#8a6a35;color:#f4efe6;padding:14px 26px;font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.22em;text-decoration:none;">Book a call →</a>
+
+          <!-- ── Hairline before CTA ── -->
+          <tr><td style="padding:56px 0 32px 0;"><div style="height:1px;background:#e8e2d5;width:60px;margin:0 auto;"></div></td></tr>
+
+          <!-- ── CTA ── -->
+          <tr><td align="center">
+            <div style="font-family:Georgia,'Instrument Serif',serif;font-size:22px;line-height:1.4;color:#1a1612;font-style:italic;max-width:380px;margin:0 auto;">Want us to walk through this with you?</div>
+            <div style="margin-top:24px;">
+              <a href="https://cal.com/sheenhaus-yseo4c" style="display:inline-block;background:#8a6a35;color:#f4efe6;padding:14px 28px;font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.22em;text-decoration:none;">Book a call →</a>
             </div>
           </td></tr>
-          <tr><td style="padding-top:48px;font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.22em;color:#a8a094;">Sheenhaus · The studio for premium brands · sheenhaus.com</td></tr>
+
+          <!-- ── Footer ── -->
+          <tr><td align="center" style="padding-top:56px;font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.22em;color:#a8a094;">Sheenhaus · The studio for premium brands · sheenhaus.com</td></tr>
+
         </table>
       </td>
     </tr>
