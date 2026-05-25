@@ -1,6 +1,7 @@
-/* Satoshi via Fontshare — only the 3 weights actually used in the JSX/CSS.
-   (Instrument Serif + IBM Plex Mono are loaded via next/font in layout.tsx
-   for self-hosting + zero render-blocking CSS.) */
+/* Fontshare — Satoshi only. Body face, three weights actually used.
+   Display face is Bodoni Moda, self-hosted via next/font in
+   layout.tsx (variable: --font-display). Instrument Serif + IBM
+   Plex Mono are also next/font self-hosted. */
 @import url('https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600&display=swap');
 
 @import "tailwindcss";
@@ -38,10 +39,6 @@
   @keyframes pulse-slow {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.35; }
-  }
-  @keyframes marquee {
-    from { transform: translate3d(0, 0, 0); }
-    to   { transform: translate3d(-50%, 0, 0); }
   }
   @keyframes veil-out {
     0%   { transform: translateY(0); }
@@ -86,7 +83,7 @@ textarea {
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 96px;
-  background: #f4efe6;
+  background: #ffffff;
   /* Reserve the vertical-scrollbar groove always, so the layout viewport
      width is identical with or without scroll content. Prevents the page
      shifting horizontally when the veil lifts and content becomes scrollable. */
@@ -94,8 +91,8 @@ html {
 }
 
 body {
-  background: #f4efe6;
-  color: #1a1612;
+  background: #ffffff;
+  color: #1a1a1a;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-family: 'Satoshi', system-ui, sans-serif;
@@ -116,15 +113,14 @@ body, .font-sans, p, button, input, textarea, span:not(.font-serif):not(.italic-
 /* After-Hours mode — between local midnight and 6am.
    Cream warms slightly, text softens, accent dims. Tiny shift the
    right visitor notices on a late-night browse. */
+/* After-hours mode on the clinical theme: very subtle warm tint
+   to the white surface only — no other token shifts, so the rest
+   of the design stays exactly as it is during the day. */
 html[data-hours="after"] body {
-  background: #f0e8d8;
-  color: #221c15;
+  background: #fdfbf6;
 }
-html[data-hours="after"] {
-  --color-bg: #f0e8d8;
-  --color-bg-surface: #e7dfcd;
-  --color-text-mid: #3f3729;
-  --color-accent: #75582b;
+html[data-hours="after"] .theme-clinical {
+  --cl-bg: #fdfbf6;
 }
 
 /* Restore default cursor on touch / coarse pointers */
@@ -167,61 +163,49 @@ body::after {
   opacity: 0.5;
 }
 
-/* ── Scrollbar ──────────────────────────────────────────────── */
+/* ── Scrollbar — neutral grey on white ───────────────────────── */
 ::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: #f4efe6; }
+::-webkit-scrollbar-track { background: #ffffff; }
 ::-webkit-scrollbar-thumb {
-  background: #d3cbb8;
+  background: rgba(0, 0, 0, 0.18);
   border-radius: 4px;
-  border: 2px solid #f4efe6;
+  border: 2px solid #ffffff;
 }
-::-webkit-scrollbar-thumb:hover { background: #b8ad95; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.3); }
 
 /* ───────────────────────────────────────────────────────────── */
 /* Reusable utility classes                                      */
 /* ───────────────────────────────────────────────────────────── */
 
-/* Gradient text — bronze (static) */
-.gradient-text {
-  background: linear-gradient(135deg, #8a6a35 0%, #a07e44 50%, #75582b 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  color: transparent;
-}
+/* ── Sign number — ink fills from bottom on scroll ─────────
+   The big "01–12" numerals in the SignsReel start as a faint
+   grey and fill with ink from the bottom as the user scrolls
+   through that sign's segment. Driven by the CSS variable
+   --fill (a 0–100% string) which framer-motion updates.
 
-/* Shimmer — slow bronze light catching across the word.
-   Used on the hero's italic emphasis word. Highlight drifts left to right
-   every 7s. Brighter cream stop in the middle of the gradient is the
-   "light catching gold" moment. */
-.shine {
+   We use a two-stop gradient (ink → faint-grey, not ink →
+   transparent), so curved glyphs like 0/6/8/9 don't show
+   weird inner cutouts when partially filled. */
+.sign-number {
   background: linear-gradient(
-    100deg,
-    #75582b 0%,
-    #8a6a35 28%,
-    #c9a16a 48%,
-    #e8d4a4 50%,
-    #c9a16a 52%,
-    #8a6a35 72%,
-    #75582b 100%
+    to top,
+    var(--cl-ink) 0%,
+    var(--cl-ink) var(--fill, 0%),
+    rgba(0, 0, 0, 0.14) var(--fill, 0%),
+    rgba(0, 0, 0, 0.14) 100%
   );
-  background-size: 280% 100%;
-  background-position: 100% 50%;
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
   background-clip: text;
+  -webkit-text-fill-color: transparent;
   color: transparent;
-  animation: shine-drift 7s ease-in-out infinite;
 }
 
+/* shine-drift — keyframes used by .shimmer-word in the clinical
+   theme to drift the bronze gradient across the masked headline word. */
 @keyframes shine-drift {
   0%   { background-position: 100% 50%; }
   50%  { background-position: 0% 50%; }
   100% { background-position: 100% 50%; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .shine { animation: none; }
 }
 
 /* Italic accent */
@@ -234,110 +218,6 @@ body::after {
   padding-right: 0.06em;
   /* Allow descenders to render without being clipped by tight leading */
   padding-bottom: 0.04em;
-}
-
-/* Vertical card hover — slow lift, soft warm shadow, numeral scale.
-   Editorial-pace transition (~700ms) so it never feels SaaS-clicky. */
-.vertical-card {
-  transition:
-    transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1),
-    background-color 700ms ease,
-    box-shadow 800ms cubic-bezier(0.2, 0.7, 0.2, 1);
-  border-radius: 2px;
-  will-change: transform;
-}
-.vertical-card:hover {
-  transform: translateY(-4px);
-  background-color: rgba(138, 106, 53, 0.025);
-  box-shadow: 0 30px 60px -28px rgba(26, 22, 18, 0.18);
-}
-.vertical-card-num {
-  transform-origin: right top;
-}
-.vertical-card:hover .vertical-card-num {
-  transform: scale(1.4);
-  letter-spacing: 0.28em;
-}
-@media (prefers-reduced-motion: reduce) {
-  .vertical-card,
-  .vertical-card:hover,
-  .vertical-card-num,
-  .vertical-card:hover .vertical-card-num {
-    transform: none;
-    transition: none;
-    box-shadow: none;
-  }
-}
-
-/* Lift card — reusable premium hover for grid cards (Services, Process,
-   Studio). Lifts subtly, drops a soft warm shadow, and a bronze sweep
-   line draws across the top edge. ~700ms editorial easing. */
-.lift-card {
-  position: relative;
-  transition:
-    transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1),
-    background-color 700ms ease,
-    box-shadow 800ms cubic-bezier(0.2, 0.7, 0.2, 1);
-  will-change: transform;
-  isolation: isolate;
-}
-.lift-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    #8a6a35 35%,
-    #c9a96e 50%,
-    #8a6a35 65%,
-    transparent 100%
-  );
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 900ms cubic-bezier(0.2, 0.7, 0.2, 1);
-  pointer-events: none;
-  z-index: 1;
-}
-.lift-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 30px 60px -28px rgba(26, 22, 18, 0.18);
-}
-.lift-card:hover::before {
-  transform: scaleX(1);
-}
-@media (prefers-reduced-motion: reduce) {
-  .lift-card, .lift-card:hover, .lift-card::before, .lift-card:hover::before {
-    transform: none;
-    transition: none;
-    box-shadow: none;
-  }
-}
-
-/* Lift row — for inline numbered items (AI section, Practice list).
-   Subtler than .lift-card: just shifts the row right + numeral colours up. */
-.lift-row {
-  transition: transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1);
-}
-.lift-row:hover {
-  transform: translateX(6px);
-}
-.lift-row .lift-row-num {
-  transition: color 700ms ease, transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1);
-  transform-origin: left center;
-}
-.lift-row:hover .lift-row-num {
-  color: var(--color-accent-bright);
-  transform: scale(1.2);
-}
-@media (prefers-reduced-motion: reduce) {
-  .lift-row, .lift-row:hover, .lift-row .lift-row-num, .lift-row:hover .lift-row-num {
-    transform: none;
-    transition: none;
-  }
 }
 
 /* Bronze hover underline — apply to text links by setting
@@ -403,15 +283,6 @@ a[data-link-style="bronze"]:hover {
   width: 100%;
 }
 
-/* ── Marquee track ─────────────────────────────────────────── */
-.marquee-track {
-  display: flex;
-  width: max-content;
-  animation: marquee 60s linear infinite;
-  will-change: transform;
-}
-.marquee-track:hover { animation-play-state: paused; }
-
 /* ── View Transitions ──────────────────────────────────────── */
 /* Native browser cinematic page-to-page transitions on supported browsers
    (Chrome, Edge, Safari 18+). Falls back gracefully on Firefox & older. */
@@ -461,7 +332,7 @@ a[data-link-style="bronze"]:hover {
 .page-veil {
   position: fixed;
   inset: 0;
-  background: #f4efe6;
+  background: #ffffff;
   z-index: 100;
   pointer-events: none;
   /* React unmounts the veil when the page is paint-ready (min 800ms).
@@ -474,19 +345,28 @@ a[data-link-style="bronze"]:hover {
   position: absolute;
   top: 50%;
   left: 50%;
-  /* Quiet, subtle wordmark — small, muted color, no gradient */
-  font-size: clamp(1.5rem, 2.2vw, 2rem);
-  letter-spacing: -0.02em;
+  /* Wordmark matches the floating-pill nav: lowercase Satoshi sans
+     with the gradient sphere on the left. Seamless veil → page. */
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Satoshi', system-ui, sans-serif;
+  font-weight: 500;
+  font-size: clamp(1.1rem, 1.6vw, 1.4rem);
+  letter-spacing: -0.015em;
   line-height: 1;
-  color: var(--color-text-mid);
+  color: #1a1a1a;
   opacity: 0;
   transform: translate(-50%, -50%);
   animation: veil-mark-in 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
   animation-delay: 0.1s;
 }
-.page-veil-mark em {
-  font-style: italic;
-  color: var(--color-accent);
+.page-veil-dot {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #1a1a1a 0%, #4a4a4a 60%, #c9b89e 100%);
 }
 
 @keyframes veil-mark-in {
@@ -503,93 +383,6 @@ a[data-link-style="bronze"]:hover {
   animation: page-rise 1.4s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
   /* Content begins rising as the veil lifts (parallel reveal) */
   animation-delay: 2.0s;
-}
-
-/* ── Selected Work index table ─────────────────────────────── */
-.work-row {
-  display: grid;
-  grid-template-columns: 60px 1.4fr 1fr 130px 24px;
-  column-gap: 24px;
-  align-items: baseline;
-  padding: 28px 0;
-  border-top: 1px solid var(--color-border);
-  transition: padding-left 0.6s cubic-bezier(0.2, 0.7, 0.2, 1),
-              background 0.6s ease,
-              opacity 0.5s ease,
-              filter 0.5s ease;
-}
-.work-row:hover { padding-left: 24px; background: rgba(138, 106, 53, 0.025); }
-.work-row:last-child { border-bottom: 1px solid var(--color-border); }
-
-/* Rack focus — when any sibling .work-row is hovered, the others
-   fade and blur slightly. Pure CSS, no JS. */
-.work-row:has(~ .work-row:hover),
-.work-row:hover ~ .work-row {
-  opacity: 0.4;
-  filter: blur(0.6px);
-}
-@media (hover: none), (pointer: coarse) {
-  .work-row:has(~ .work-row:hover),
-  .work-row:hover ~ .work-row {
-    opacity: 1;
-    filter: none;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .work-row:has(~ .work-row:hover),
-  .work-row:hover ~ .work-row {
-    opacity: 1;
-    filter: none;
-  }
-}
-@media (max-width: 768px) {
-  .work-row {
-    grid-template-columns: 40px 1fr 60px;
-    grid-template-rows: auto auto;
-    row-gap: 6px;
-    padding: 22px 0;
-  }
-  .work-row .work-meta {
-    grid-column: 2 / 4;
-    grid-row: 2;
-  }
-  .work-row:hover { padding-left: 12px; }
-}
-
-.work-preview {
-  position: fixed;
-  pointer-events: none;
-  width: 340px;
-  height: 220px;
-  border-radius: 4px;
-  overflow: hidden;
-  opacity: 0;
-  transform: translate(-50%, -50%) scale(0.94) rotate(-1.5deg);
-  transition: opacity 0.45s cubic-bezier(0.2, 0.7, 0.2, 1),
-              transform 0.55s cubic-bezier(0.2, 0.7, 0.2, 1);
-  z-index: 60;
-  box-shadow: 0 40px 80px -20px rgba(26, 22, 18, 0.35);
-  border: 1px solid rgba(138, 106, 53, 0.3);
-  background: #1a1612;
-}
-.work-preview[data-show="true"] {
-  opacity: 1;
-  transform: translate(-50%, -50%) scale(1) rotate(0deg);
-}
-@media (max-width: 768px) { .work-preview { display: none; } }
-
-/* ── Recognition logos ─────────────────────────────────────── */
-.recognition-mark {
-  font-family: var(--font-instrument-serif), 'Instrument Serif', Georgia, serif;
-  font-style: italic;
-  color: var(--color-text-dim);
-  opacity: 0.55;
-  transition: opacity 0.6s ease, color 0.6s ease;
-  letter-spacing: -0.01em;
-}
-.recognition-mark:hover {
-  opacity: 1;
-  color: var(--color-text-mid);
 }
 
 /* ── Buttons ───────────────────────────────────────────────── */
@@ -653,3 +446,452 @@ a[data-link-style="bronze"]:hover {
 /* ── Big section spacing ───────────────────────────────────── */
 .section-pad { padding-top: 120px; padding-bottom: 120px; }
 @media (min-width: 768px) { .section-pad { padding-top: 160px; padding-bottom: 160px; } }
+
+/* ──────────────────────────────────────────────────────────── */
+/* SaaS hero experiment — scoped tokens                          */
+/*                                                                */
+/* Only applies inside .theme-saas so the existing cream/bronze   */
+/* palette is untouched everywhere else. Lets us A/B the hero     */
+/* without forking the codebase — remove .theme-saas from the     */
+/* hero wrapper to revert.                                        */
+/* ──────────────────────────────────────────────────────────── */
+.theme-saas {
+  --saas-bg: hsl(0 0% 100%);
+  --saas-fg: hsl(210 14% 17%);
+  --saas-muted: hsl(0 0% 96%);
+  --saas-muted-fg: hsl(184 5% 55%);
+  --saas-accent: hsl(239 84% 67%);
+  --saas-accent-fg: hsl(0 0% 100%);
+  --saas-border: hsl(0 0% 90%);
+  --saas-shadow-dashboard:
+    0 25px 80px -12px rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(0, 0, 0, 0.06);
+
+  background: var(--saas-bg);
+  color: var(--saas-fg);
+  font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
+}
+.theme-saas .font-display {
+  font-family: var(--font-instrument-serif), 'Instrument Serif', Georgia, serif;
+  font-style: normal;
+  font-weight: 400;
+}
+.theme-saas .font-display em {
+  font-style: italic;
+  font-weight: 400;
+}
+.theme-saas .font-body {
+  font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
+}
+
+/* ──────────────────────────────────────────────────────────── */
+/* Dark portfolio experiment — scoped tokens                     */
+/* ──────────────────────────────────────────────────────────── */
+.theme-portfolio {
+  --pf-bg: hsl(0 0% 4%);
+  --pf-surface: hsl(0 0% 8%);
+  --pf-text: hsl(0 0% 96%);
+  --pf-muted: hsl(0 0% 53%);
+  --pf-stroke: hsl(0 0% 12%);
+  --pf-accent-gradient: linear-gradient(90deg, #89AACC 0%, #4E85BF 100%);
+
+  background: var(--pf-bg);
+  color: var(--pf-text);
+  font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
+  /* Selection stays off globally — matches the rest of the site. */
+}
+.theme-portfolio .pf-display {
+  font-family: var(--font-instrument-serif), 'Instrument Serif', Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+}
+.theme-portfolio .pf-accent-grad-bg {
+  background: var(--pf-accent-gradient);
+}
+.theme-portfolio .pf-accent-grad-text {
+  background: var(--pf-accent-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+/* Animated gradient border ring used on hover-CTAs */
+@keyframes pf-gradient-shift {
+  0%   { background-position:   0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position:   0% 50%; }
+}
+.theme-portfolio .pf-ring-grad {
+  background: linear-gradient(90deg, #89AACC 0%, #4E85BF 50%, #89AACC 100%);
+  background-size: 200% 100%;
+  animation: pf-gradient-shift 6s ease infinite;
+}
+/* Scroll-down indicator line animation */
+@keyframes pf-scroll-down {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(200%); }
+}
+.theme-portfolio .pf-animate-scroll-down {
+  animation: pf-scroll-down 1.5s ease-in-out infinite;
+}
+@keyframes pf-role-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.theme-portfolio .pf-animate-role-fade-in {
+  animation: pf-role-fade-in 0.4s ease-out;
+}
+
+/* ──────────────────────────────────────────────────────────── */
+/* Avon-style clinical white scheme — scoped tokens             */
+/* Pure white surface, sans headline, soft pearlescent halo     */
+/* behind a "specimen card" that holds real product data.       */
+/* ──────────────────────────────────────────────────────────── */
+.theme-clinical {
+  --cl-bg: #ffffff;
+  --cl-surface: #fafafa;
+  --cl-ink: #1a1a1a;
+  --cl-ink-soft: #555;
+  --cl-ink-faint: #8a8a8a;
+  --cl-stroke: rgba(0, 0, 0, 0.08);
+  --cl-stroke-soft: rgba(0, 0, 0, 0.04);
+  --cl-tag-bg: rgba(0, 0, 0, 0.03);
+  --cl-pill-bg: #f4ede0;       /* warm beige Get-Started pill */
+  --cl-pill-ink: #6a5230;
+
+  background: var(--cl-bg);
+  color: var(--cl-ink);
+  font-family: 'Satoshi', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-feature-settings: 'ss01', 'ss02', 'cv11';
+  /* Selection stays off globally (see html, body rule above).
+     Only mailto/tel/inputs re-enable it — premium / editorial feel. */
+
+  /* Override the legacy cream/bronze tokens with clinical-light
+     equivalents so every existing Tailwind class (bg-accent,
+     text-text-mid, border-border, btn-bronze, etc.) auto-rebinds
+     to the new palette inside .theme-clinical. One change here =
+     four pages re-skinned. */
+  --color-bg: #ffffff;
+  --color-bg-surface: #fafafa;
+  --color-bg-surface-2: #f3f3f3;
+  --color-border: rgba(0, 0, 0, 0.08);
+  --color-border-light: rgba(0, 0, 0, 0.12);
+  --color-accent: #8a6a35;
+  --color-accent-bright: #a07e44;
+  --color-accent-warm: #75582b;
+  --color-accent-dim: rgba(138, 106, 53, 0.04);
+  --color-accent-mid: rgba(138, 106, 53, 0.12);
+  --color-text: #1a1a1a;
+  --color-text-mid: #555;
+  --color-text-dim: #777;
+  --color-text-faint: #8a8a8a;
+}
+/* Display — Instrument Serif. Same face as the rest of the site
+   (theses, signs, field report) so the homepage is visually
+   consistent with production. */
+.theme-clinical .cl-display {
+  font-family: var(--font-instrument-serif), 'Instrument Serif', Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.022em;
+  font-synthesis: none;
+  font-feature-settings: 'liga', 'dlig';
+}
+.theme-clinical .cl-display em,
+.theme-clinical .cl-display i {
+  font-family: var(--font-instrument-serif), 'Instrument Serif', Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+}
+/* Soft radial halo behind a centerpiece — pearl/specimen feel */
+.theme-clinical .cl-halo {
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 245, 220, 0.55) 0%,
+    rgba(245, 235, 215, 0.25) 35%,
+    transparent 70%
+  );
+}
+/* Subtle drifting shimmer on the halo */
+@keyframes cl-halo-drift {
+  0%, 100% { transform: scale(1) translate(0, 0); opacity: 1; }
+  50%      { transform: scale(1.04) translate(-1%, -0.5%); opacity: 0.92; }
+}
+.theme-clinical .cl-halo-anim {
+  animation: cl-halo-drift 12s ease-in-out infinite;
+}
+
+/* ── Drifting gradient mesh background ─────────────────────
+ * Three soft warm gradient blobs that slowly drift across the
+ * white. Lives behind everything via z:0; the hero content sits
+ * on z:10. GPU-accelerated transforms only — no repaints, no
+ * jank. Stops at the page fold so it doesn't bleed into other
+ * sections.
+ */
+.theme-clinical .cl-mesh {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.theme-clinical .cl-mesh::before,
+.theme-clinical .cl-mesh::after,
+.theme-clinical .cl-mesh > span {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  will-change: transform, opacity;
+}
+/* Blob 1 — warm pearl, top-left */
+.theme-clinical .cl-mesh::before {
+  width: 55vw;
+  height: 55vw;
+  top: -10vw;
+  left: -15vw;
+  background: radial-gradient(
+    circle,
+    rgba(255, 230, 200, 0.55) 0%,
+    rgba(255, 230, 200, 0) 70%
+  );
+  animation: cl-mesh-drift-1 42s ease-in-out infinite;
+}
+/* Blob 2 — cool pearl, bottom-right */
+.theme-clinical .cl-mesh::after {
+  width: 60vw;
+  height: 60vw;
+  bottom: -20vw;
+  right: -18vw;
+  background: radial-gradient(
+    circle,
+    rgba(220, 230, 240, 0.6) 0%,
+    rgba(220, 230, 240, 0) 70%
+  );
+  animation: cl-mesh-drift-2 56s ease-in-out infinite;
+}
+/* Blob 3 — soft champagne, center-right */
+.theme-clinical .cl-mesh > span {
+  width: 45vw;
+  height: 45vw;
+  top: 25%;
+  right: -8vw;
+  background: radial-gradient(
+    circle,
+    rgba(245, 215, 175, 0.4) 0%,
+    rgba(245, 215, 175, 0) 70%
+  );
+  animation: cl-mesh-drift-3 48s ease-in-out infinite;
+}
+@keyframes cl-mesh-drift-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%      { transform: translate(6vw, 4vw) scale(1.08); }
+  66%      { transform: translate(-3vw, 7vw) scale(0.95); }
+}
+@keyframes cl-mesh-drift-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  40%      { transform: translate(-5vw, -6vw) scale(1.1); }
+  80%      { transform: translate(4vw, -3vw) scale(0.92); }
+}
+@keyframes cl-mesh-drift-3 {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.85; }
+  50%      { transform: translate(-7vw, 3vw) scale(1.12); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-clinical .cl-mesh::before,
+  .theme-clinical .cl-mesh::after,
+  .theme-clinical .cl-mesh > span {
+    animation: none;
+  }
+}
+
+
+
+
+/* ──────────────────────────────────────────────────────────────
+ * Shimmer word — bronze→cream→bronze gradient drifts across the
+ * letterforms via background-clip: text. The Hermès / Loro Piana
+ * "gold catching light" trick: premium, immediate, no video.
+ * ────────────────────────────────────────────────────────────── */
+.theme-clinical .shimmer-word {
+  display: inline-block;
+  font-family: var(--font-instrument-serif), 'Instrument Serif', Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  background: linear-gradient(
+    120deg,
+    #8a6a35 0%,
+    #c9a96e 35%,
+    #e8d4a4 50%,
+    #c9a96e 65%,
+    #8a6a35 100%
+  );
+  background-size: 240% 100%;
+  background-position: 100% 50%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: shine-drift 8s ease-in-out infinite;
+  /* Italic glyphs lean right — give the trailing edge a touch of
+     room so the next word doesn't kiss it. */
+  padding-right: 0.04em;
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-clinical .shimmer-word { animation: none; }
+}
+
+/* ── Sheen — slow iridescent conic shimmer over the hero ──── */
+.theme-clinical .sheen-conic {
+  background: conic-gradient(
+    from 0deg at 50% 50%,
+    rgba(255, 240, 215, 0) 0deg,
+    rgba(255, 235, 200, 0.18) 60deg,
+    rgba(220, 232, 245, 0.16) 140deg,
+    rgba(255, 235, 200, 0.14) 220deg,
+    rgba(245, 215, 175, 0.18) 300deg,
+    rgba(255, 240, 215, 0) 360deg
+  );
+  mix-blend-mode: screen;
+  animation: sheen-spin 50s linear infinite;
+}
+@keyframes sheen-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-clinical .sheen-conic { animation: none; }
+}
+
+/* ── Drift used on the centre champagne blob ─────────────── */
+.theme-clinical .cl-mesh-drift {
+  animation: cl-mesh-drift-3 48s ease-in-out infinite;
+}
+
+/* ── CTA pills — primary near-black, ghost cream ──────────── */
+.theme-clinical .cta-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px 28px;
+  border-radius: 999px;
+  background: var(--cl-ink);
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: background 0.5s ease, transform 0.5s ease, box-shadow 0.5s ease;
+  box-shadow: 0 12px 30px -12px rgba(0, 0, 0, 0.25);
+}
+.theme-clinical .cta-primary:hover {
+  background: #2a2a2a;
+  transform: translateY(-1px);
+  box-shadow: 0 18px 40px -14px rgba(0, 0, 0, 0.3);
+}
+.theme-clinical .cta-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 15px 26px;
+  border-radius: 999px;
+  border: 1px solid var(--cl-stroke);
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  color: var(--cl-ink);
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: border-color 0.5s ease, color 0.5s ease, background 0.5s ease;
+}
+.theme-clinical .cta-ghost:hover {
+  border-color: #8a6a35;
+  color: #8a6a35;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+/* ── Ken-Burns slow zoom on background imagery ────────────── */
+.ken-burns {
+  animation: ken-burns 30s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes ken-burns {
+  0%   { transform: scale(1.05) translate(0, 0); }
+  100% { transform: scale(1.18) translate(-2%, -3%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ken-burns { animation: none; }
+}
+
+/* ── Audit invite — input field ────────────────────────────
+   Pill width tracks the typed URL via the input's `size` attr.
+   `inline-flex` + `max-width` keeps it from over-running its
+   container; transition smooths the resize. */
+.audit-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  padding: 8px 8px 8px 22px;
+  background: #fff;
+  border: 1px solid var(--cl-stroke);
+  border-radius: 999px;
+  box-shadow: 0 18px 50px -20px rgba(0, 0, 0, 0.12);
+  transition: border-color 0.5s ease, box-shadow 0.5s ease, transform 0.5s ease;
+  max-width: 100%;
+}
+.audit-field:focus-within {
+  border-color: #8a6a35;
+  box-shadow: 0 22px 60px -20px rgba(138, 106, 53, 0.25);
+  transform: translateY(-1px);
+}
+.audit-field-prefix {
+  font-family: var(--font-ibm-plex-mono), monospace;
+  font-size: 13px;
+  letter-spacing: -0.01em;
+  padding-right: 4px;
+  user-select: none;
+  flex-shrink: 0;
+}
+.audit-field-input {
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font-family: 'Satoshi', system-ui, sans-serif;
+  font-size: 16px;
+  color: var(--cl-ink);
+  padding: 12px 8px;
+  min-width: 0;
+  /* The `size` attr drives the width; we just smooth the change. */
+  transition: width 0.4s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.audit-field-input::placeholder {
+  color: var(--cl-ink-faint);
+}
+.audit-field-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 22px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  background: var(--cl-ink);
+  color: #fff;
+  border: 0;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.4s ease, transform 0.4s ease, opacity 0.4s ease;
+}
+.audit-field-btn:hover:not(:disabled) {
+  background: #2a2a2a;
+  transform: translateX(2px);
+}
+.audit-field-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

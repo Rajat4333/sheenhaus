@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Instrument_Serif, IBM_Plex_Mono } from "next/font/google";
+import { Instrument_Serif, IBM_Plex_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
 import PageVeil from "@/components/PageVeil";
@@ -22,6 +22,13 @@ const ibmPlexMono = IBM_Plex_Mono({
   subsets: ["latin"],
   weight: ["400", "500", "600"],
   variable: "--font-ibm-plex-mono",
+  display: "swap",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-inter",
   display: "swap",
 });
 
@@ -51,7 +58,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${instrumentSerif.variable} ${ibmPlexMono.variable}`}
+      className={`${instrumentSerif.variable} ${ibmPlexMono.variable} ${inter.variable}`}
     >
       <body className="overflow-x-hidden">
         <PageVeil />

@@ -34,13 +34,23 @@ export default function AfterHours() {
     <div
       className="fixed bottom-6 right-6 z-30 pointer-events-none flex items-center gap-2 px-3 py-2 rounded-full"
       style={{
-        background: "rgba(26, 22, 18, 0.06)",
+        background: "rgba(255, 255, 255, 0.85)",
         backdropFilter: "blur(8px)",
-        border: "1px solid rgba(138, 106, 53, 0.2)",
+        border: "1px solid rgba(0, 0, 0, 0.08)",
+        boxShadow: "0 4px 24px -8px rgba(0,0,0,0.08)",
       }}
     >
-      <span className="w-1.5 h-1.5 rounded-full bg-accent opacity-70" />
-      <span className="font-mono text-[9px] uppercase tracking-[0.22em] text-text-mid whitespace-nowrap">
+      <span
+        className="w-1.5 h-1.5 rounded-full opacity-80"
+        style={{ background: "#8a6a35" }}
+      />
+      <span
+        className="text-[9px] uppercase tracking-[0.22em] whitespace-nowrap"
+        style={{
+          fontFamily: "var(--font-ibm-plex-mono), monospace",
+          color: "#555",
+        }}
+      >
         Studio · After Hours
       </span>
     </div>

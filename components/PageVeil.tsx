@@ -66,8 +66,12 @@ export default function PageVeil() {
 
   return (
     <div className="page-veil" aria-hidden="true">
-      <span className="page-veil-mark font-serif">
-        Sheen<em>haus</em>
+      {/* Wordmark matches the floating-pill nav so the transition
+          from veil → page is seamless: same gradient dot, same
+          lowercase Satoshi tracking. No jarring style swap. */}
+      <span className="page-veil-mark">
+        <span className="page-veil-dot" aria-hidden />
+        sheenhaus
       </span>
     </div>
   );

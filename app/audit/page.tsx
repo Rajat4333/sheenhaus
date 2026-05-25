@@ -1,7 +1,7 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import Navbar from "@/components/Navbar";
+import ClinicalNavbar from "@/components/ClinicalNavbar";
 
 const CAL_LINK = "https://cal.com/sheenhaus-yseo4c";
 
@@ -93,15 +93,37 @@ function scoreColor(n: number): string {
   return "var(--color-text)";
 }
 
+/* Read the homepage's stashed URL during state init so we don't
+   trigger a cascading setState inside useEffect. Runs once on first
+   render; sessionStorage is cleared so a reload of /audit doesn't
+   replay the audit. */
+function readStashedUrl(): string {
+  if (typeof window === "undefined") return "";
+  try {
+    const v = sessionStorage.getItem("sh:audit-url");
+    if (v && v.trim()) {
+      sessionStorage.removeItem("sh:audit-url");
+      return v.trim();
+    }
+  } catch {
+    /* private-mode sessionStorage can throw — silent fallback */
+  }
+  return "";
+}
+
 export default function AuditPage() {
-  const [url, setUrl] = useState("");
+  const initialUrl = readStashedUrl();
+  const [url, setUrl] = useState(initialUrl);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ApiResponse | null>(null);
+  // One-shot guard so React's StrictMode double-invocation in dev
+  // doesn't fire two audits when arriving from the homepage.
+  const autoRanRef = useRef(false);
 
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!url.trim() || loading) return;
+  const runAudit = async (target: string) => {
+    const trimmed = target.trim();
+    if (!trimmed) return;
     setLoading(true);
     setError(null);
     setResult(null);
@@ -109,7 +131,7 @@ export default function AuditPage() {
       const res = await fetch("/api/audit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: url.trim() }),
+        body: JSON.stringify({ url: trimmed }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -124,37 +146,72 @@ export default function AuditPage() {
     }
   };
 
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (loading) return;
+    runAudit(url);
+  };
+
+  // Kick off the audit once if we arrived with a stashed URL.
+  // Deferred to a microtask so the setState calls inside runAudit
+  // happen after the effect's render cycle, not synchronously.
+  useEffect(() => {
+    if (autoRanRef.current) return;
+    if (!initialUrl) return;
+    autoRanRef.current = true;
+    const id = setTimeout(() => runAudit(initialUrl), 0);
+    return () => clearTimeout(id);
+  }, [initialUrl]);
+
+  // Before a result is in, the page is masthead + form only. We
+  // vertically centre those inside a viewport-tall section so the
+  // page doesn't read as an empty endless cream void below the form.
+  // Once the visitor runs an audit, the result block flows naturally
+  // beneath, so we drop the viewport-tall framing.
+  //
+  // `initialUrl` is also a "not-idle" signal: if we arrived with a
+  // stashed URL from the homepage, an audit is about to fire in the
+  // next tick (via the setTimeout in useEffect). Treat the page as
+  // non-idle from the first render so the layout doesn't flash from
+  // centred → top-aligned when loading flips true.
+  const idle = !result && !loading && !error && !initialUrl;
+
   return (
-    <>
-      <Navbar />
+    <main className="theme-clinical" style={{ background: "var(--cl-bg)" }}>
+      <ClinicalNavbar />
 
-      {/* Ambient warm orbs */}
-      <div className="fixed top-[-300px] right-[-200px] w-[900px] h-[900px] rounded-full bg-[radial-gradient(circle,rgba(138,106,53,0.08)_0%,transparent_60%)] pointer-events-none z-0" />
-      <div className="fixed bottom-[-400px] left-[-300px] w-[800px] h-[800px] rounded-full bg-[radial-gradient(circle,rgba(45,74,58,0.06)_0%,transparent_60%)] pointer-events-none z-0" />
+      <div
+        className={
+          idle
+            ? "min-h-screen flex flex-col justify-center pt-32 pb-24"
+            : ""
+        }
+      >
+        {/* MASTHEAD */}
+        <section
+          className={`relative z-10 shell ${idle ? "pt-0 pb-10" : "pt-40 sm:pt-48 md:pt-56 pb-12"}`}
+        >
+          <div className="inline-flex items-center gap-3">
+            <span className="w-6 h-px bg-accent" />
+            <span className="font-mono text-[12px] uppercase tracking-[0.2em] text-text-mid whitespace-nowrap">
+              The Audit
+            </span>
+          </div>
+          <h1 className="display-serif font-serif text-[clamp(2.5rem,7vw,5.5rem)] leading-[1.04] tracking-[-0.035em] mt-10 max-w-[22ch]">
+            Audit your website against the{" "}
+            <em className="italic-accent">Twelve Signs</em>.
+          </h1>
+          <p className="text-text-mid text-[17px] max-w-2xl mt-10 leading-[1.8]">
+            Paste your URL. We will fetch the site, run a real Lighthouse pass,
+            and check it against the twelve patterns premium businesses
+            unknowingly tolerate. You get a single score, a per-category
+            breakdown, and the specific signs that apply &mdash; in under twenty
+            seconds.
+          </p>
+        </section>
 
-      {/* MASTHEAD */}
-      <section className="relative z-10 shell pt-40 sm:pt-48 md:pt-56 pb-12">
-        <div className="inline-flex items-center gap-3">
-          <span className="w-6 h-px bg-accent" />
-          <span className="font-mono text-[12px] uppercase tracking-[0.2em] text-text-mid whitespace-nowrap">
-            The Audit
-          </span>
-        </div>
-        <h1 className="display-serif font-serif text-[clamp(2.5rem,7vw,5.5rem)] leading-[1.04] tracking-[-0.035em] mt-10 max-w-[22ch]">
-          Audit your website against the{" "}
-          <em className="italic-accent">Twelve Signs</em>.
-        </h1>
-        <p className="text-text-mid text-[17px] max-w-2xl mt-10 leading-[1.8]">
-          Paste your URL. We will fetch the site, run a real Lighthouse pass,
-          and check it against the twelve patterns premium businesses
-          unknowingly tolerate. You get a single score, a per-category
-          breakdown, and the specific signs that apply &mdash; in under twenty
-          seconds.
-        </p>
-      </section>
-
-      {/* FORM */}
-      <section className="relative z-10 shell pb-16">
+        {/* FORM */}
+        <section className={`relative z-10 shell ${idle ? "pb-0" : "pb-16"}`}>
         <form
           onSubmit={onSubmit}
           className="flex flex-col sm:flex-row gap-3 max-w-3xl"
@@ -175,6 +232,7 @@ export default function AuditPage() {
             onChange={(e) => setUrl(e.target.value)}
             disabled={loading}
             required
+            maxLength={253}
             className="flex-1 px-6 py-5 bg-bg-surface border border-border rounded-sm font-mono text-[14px] text-text placeholder:text-text-faint focus:outline-none focus:border-accent transition-colors duration-500 disabled:opacity-60"
             aria-label="Website URL to audit"
           />
@@ -257,7 +315,8 @@ export default function AuditPage() {
           </div>
         </section>
       )}
-    </>
+      </div>
+    </main>
   );
 }
 

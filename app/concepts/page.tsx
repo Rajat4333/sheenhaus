@@ -1,18 +1,14 @@
 "use client";
 import Link from "next/link";
-import Navbar from "@/components/Navbar";
+import ClinicalNavbar from "@/components/ClinicalNavbar";
 import ThesesView from "./ThesesView";
 
 const CAL_LINK = "https://cal.com/sheenhaus-yseo4c";
 
 export default function ConceptsPage() {
   return (
-    <>
-      <Navbar />
-
-      {/* Ambient warm orbs */}
-      <div className="fixed top-[-300px] right-[-200px] w-[900px] h-[900px] rounded-full bg-[radial-gradient(circle,rgba(138,106,53,0.08)_0%,transparent_60%)] pointer-events-none z-0" />
-      <div className="fixed bottom-[-400px] left-[-300px] w-[800px] h-[800px] rounded-full bg-[radial-gradient(circle,rgba(45,74,58,0.06)_0%,transparent_60%)] pointer-events-none z-0" />
+    <main className="theme-clinical" style={{ background: "var(--cl-bg)", minHeight: "100vh" }}>
+      <ClinicalNavbar />
 
       {/* MASTHEAD */}
       <section className="relative z-10 shell pt-40 sm:pt-48 md:pt-56 pb-20">
@@ -76,6 +72,6 @@ export default function ConceptsPage() {
           </Link>
         </div>
       </section>
-    </>
+    </main>
   );
 }
