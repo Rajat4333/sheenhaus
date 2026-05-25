@@ -65,9 +65,12 @@ export default function AuditInvite() {
           viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: 0.9, ease: [0.2, 0.7, 0.2, 1] }}
         >
-          {/* Scanner ring — the audit, drawn. Twelve ticks for the
-              twelve signs; the sweeping arc reads as "in progress". */}
-          <ScannerRing />
+          {/* Audit specimen — a quiet preview of what a real audit
+              result looks like. 12 vertical ticks for the 12 signs,
+              eight detected (tall + bronze), four clean (short + grey).
+              The numbers below are the same shape every visitor will
+              see when they paste their own URL. */}
+          <AuditSpecimen />
           <div
             className="text-[10px] uppercase tracking-[0.32em] mb-6"
             style={{ color: "var(--cl-ink-faint)" }}
@@ -151,56 +154,106 @@ export default function AuditInvite() {
   );
 }
 
-/* ─── Scanner dial — 12 ticks for 12 signs, a slow sweeping needle ─ */
-function ScannerRing() {
-  const ticks = Array.from({ length: 12 });
+/* ─── Audit specimen — a quiet sample of an audit result ─────
+   12 vertical bars: 8 are tall + bronze (signs detected), 4 are
+   short + grey (signs clean). A score number, a verdict word, a
+   /100 denominator. Animates in once on scroll. Reads as "this
+   is the actual shape of the deliverable". */
+function AuditSpecimen() {
+  // Heights per bar (0-1). Tall+bronze = sign detected, short+grey = clean.
+  // Mix is intentionally roughly average for the jewellery dataset.
+  const BARS: Array<[number, boolean]> = [
+    [0.85, true],   // 01 nav
+    [0.72, true],   // 02 popup
+    [0.18, false],  // 03 video hero — clean
+    [0.78, true],   // 04 stock photos
+    [0.62, true],   // 05 url
+    [0.20, false],  // 06 weights — clean
+    [0.55, true],   // 07 form
+    [0.18, false],  // 08 solutions — clean
+    [0.50, true],   // 09 testimonials
+    [0.92, true],   // 10 performance — worst
+    [0.22, false],  // 11 repeated hero — clean
+    [0.88, true],   // 12 AI discoverability
+  ];
+  const detected = BARS.filter(([, b]) => b).length;
+
   return (
-    <motion.svg
-      viewBox="0 0 100 100"
-      width="80"
-      height="80"
-      className="block mx-auto mb-7"
-      aria-hidden
-      initial={{ opacity: 0, scale: 0.9 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true, amount: 0.5 }}
+    <motion.figure
+      initial={{ opacity: 0, y: 8 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.4 }}
       transition={{ duration: 0.9, ease: [0.2, 0.7, 0.2, 1] }}
+      className="mx-auto mb-10 inline-flex flex-col items-center gap-4"
+      style={{
+        padding: "20px 28px",
+        background: "rgba(255,253,248,0.55)",
+        border: "1px solid var(--cl-stroke)",
+        borderRadius: 8,
+        backdropFilter: "blur(6px)",
+        boxShadow: "0 8px 28px -16px rgba(58,42,20,0.18)",
+      }}
     >
-      {/* Faint outer dial */}
-      <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(26,22,18,0.14)" strokeWidth="0.6" />
-      {/* Inner ring — quieter, anchors the needle visually */}
-      <circle cx="50" cy="50" r="6" fill="none" stroke="rgba(138,106,53,0.25)" strokeWidth="0.6" />
+      {/* Top caption */}
+      <div className="text-[9px] uppercase tracking-[0.26em] text-center"
+           style={{ color: "var(--cl-ink-faint)", fontFamily: "var(--font-ibm-plex-mono), monospace" }}>
+        Audit · Specimen <span style={{ opacity: 0.5 }}>·</span> SH-2026-01
+      </div>
 
-      {/* Twelve ticks — coords rounded so SSR + client serialise identically */}
-      {ticks.map((_, i) => {
-        const a = (i / 12) * Math.PI * 2 - Math.PI / 2;
-        const inner = i % 3 === 0 ? 30 : 33.5;
-        const x1 = (50 + Math.cos(a) * 38).toFixed(3);
-        const y1 = (50 + Math.sin(a) * 38).toFixed(3);
-        const x2 = (50 + Math.cos(a) * inner).toFixed(3);
-        const y2 = (50 + Math.sin(a) * inner).toFixed(3);
-        return (
-          <line
+      {/* The 12 bars */}
+      <div className="flex items-end gap-[6px]" style={{ height: 56 }}>
+        {BARS.map(([h, hit], i) => (
+          <motion.span
             key={i}
-            x1={x1} y1={y1} x2={x2} y2={y2}
-            stroke="rgba(26,22,18,0.55)"
-            strokeWidth={i % 3 === 0 ? "1.1" : "0.6"}
+            initial={{ scaleY: 0, opacity: 0 }}
+            whileInView={{ scaleY: 1, opacity: 1 }}
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{
+              duration: 0.55,
+              delay: 0.25 + i * 0.045,
+              ease: [0.2, 0.7, 0.2, 1],
+            }}
+            style={{
+              display: "inline-block",
+              width: 5,
+              height: `${Math.round(h * 56)}px`,
+              background: hit ? "#8a6a35" : "rgba(26,22,18,0.16)",
+              borderRadius: 1,
+              transformOrigin: "bottom",
+            }}
+            aria-hidden
           />
-        );
-      })}
+        ))}
+      </div>
 
-      {/* Sweeping needle — single bronze line, anchored at center, tip at outer ring */}
-      <motion.line
-        x1="50" y1="50" x2="50" y2="14"
-        stroke="#8a6a35"
-        strokeWidth="1.2"
-        strokeLinecap="round"
-        style={{ transformOrigin: "50px 50px" }}
-        animate={{ rotate: 360 }}
-        transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
-      />
-      {/* Center pin */}
-      <circle cx="50" cy="50" r="1.6" fill="#1a1612" />
-    </motion.svg>
+      {/* Score + verdict row */}
+      <div className="flex items-baseline gap-3 mt-1">
+        <motion.span
+          className="cl-display tabular-nums leading-none"
+          style={{
+            fontSize: 30,
+            color: "var(--cl-ink)",
+            letterSpacing: "-0.03em",
+          }}
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, amount: 0.5 }}
+          transition={{ duration: 0.7, delay: 0.9 }}
+        >
+          52
+        </motion.span>
+        <span className="text-[10px] uppercase tracking-[0.22em]"
+              style={{ color: "var(--cl-ink-faint)", fontFamily: "var(--font-ibm-plex-mono), monospace" }}>
+          / 100 · Drifting
+        </span>
+      </div>
+
+      {/* Bottom caption */}
+      <div className="text-[9px] uppercase tracking-[0.26em]"
+           style={{ color: "#8a6a35", fontFamily: "var(--font-ibm-plex-mono), monospace" }}>
+        {detected} of {BARS.length} signs detected
+      </div>
+    </motion.figure>
   );
 }
+
