@@ -10,8 +10,8 @@ import { useEffect, useState } from "react";
  *   3. Honour a minimum of 1.4s so the wordmark intro can still land
  *   4. Hard fallback of 4s so the veil can never get stuck
  */
-const MIN_INTRO_MS = 800;
-const HARD_TIMEOUT_MS = 2500;
+const MIN_INTRO_MS = 100;
+const HARD_TIMEOUT_MS = 1500;
 
 export default function PageVeil() {
   const [done, setDone] = useState(false);

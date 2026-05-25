@@ -6,7 +6,6 @@
    is a slow Ken-Burns gold-macro still. */
 
 import { motion, useInView } from "framer-motion";
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
@@ -36,33 +35,26 @@ export default function FieldReport() {
   const inView = useInView(ref, { once: true, amount: 0.3 });
 
   return (
-    <section
+    <motion.section
       ref={ref}
       className="theme-clinical relative overflow-hidden"
       style={{ background: "var(--cl-bg)" }}
+      initial={{ opacity: 0, filter: "blur(14px)", y: 32 }}
+      whileInView={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+      viewport={{ once: true, amount: 0.15 }}
+      transition={{ duration: 1.3, ease: [0.2, 0.7, 0.2, 1] }}
     >
-      {/* Background image — slow drifting macro of gold work */}
-      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-        <div className="absolute inset-0 ken-burns">
-          <Image
-            src="https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=2400&q=85&auto=format&fit=crop"
-            alt=""
-            fill
-            sizes="100vw"
-            className="object-cover"
-            style={{ filter: "saturate(0.85) brightness(1.05)" }}
-            priority={false}
-          />
-        </div>
-        {/* Cream wash to keep the background quiet */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.88) 50%, rgba(255,255,255,0.95) 100%)",
-          }}
-        />
-      </div>
+      {/* Quiet bronze halo — replaces the invisible gold-macro photo
+          with a focused warm wash behind the median score. */}
+      <div
+        className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] rounded-full pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(circle, rgba(201,169,110,0.18) 0%, rgba(201,169,110,0) 65%)",
+          filter: "blur(80px)",
+        }}
+        aria-hidden
+      />
 
       <div className="relative z-10 max-w-[1100px] mx-auto px-6 py-32 md:py-44">
         {/* Eyebrow */}
@@ -70,8 +62,8 @@ export default function FieldReport() {
           className="text-[10px] uppercase tracking-[0.32em] mb-8 text-center"
           style={{ color: "var(--cl-ink-faint)" }}
         >
-          <span style={{ color: "#8a6a35" }}>●</span> Field Report · Chapter 01 ·
-          Jewellery
+          <span style={{ color: "#8a6a35" }}>●</span> Field Report · One example
+          · The jewellery houses
         </div>
 
         {/* Big claim */}
@@ -84,9 +76,8 @@ export default function FieldReport() {
             maxWidth: "20ch",
           }}
         >
-          India&rsquo;s listed jewellers built{" "}
-          <em>₹{STATS.lakhCr} lakh crore</em> of offline brand. Their websites
-          are not part of that work.
+          Most businesses build serious brands offline. Then{" "}
+          <em>hand the digital surface</em> to whoever was cheapest.
         </h2>
 
         {/* The big number block */}
@@ -133,36 +124,15 @@ export default function FieldReport() {
               We ran the Sheenhaus Audit against every publicly-listed Indian
               jewellery company — seven houses, from Tanishq down to P. N.
               Gadgil. The country&rsquo;s largest house refuses to be audited
-              at all.
+              at all. The same pattern shows up across the businesses we audit
+              elsewhere — clinics, agencies, restaurants, D2C brands.
             </p>
           </div>
 
-          {/* Category bars */}
-          <div className="space-y-7">
-            <div
-              className="text-[10px] uppercase tracking-[0.28em] mb-2"
-              style={{ color: "var(--cl-ink-faint)" }}
-            >
-              Average across the sample
-            </div>
-            {CATEGORY_BARS.map((c, i) => (
-              <Bar
-                key={c.label}
-                label={c.label}
-                value={c.value}
-                delay={0.3 + i * 0.12}
-                active={inView}
-              />
-            ))}
-            <div
-              className="text-[11px] uppercase tracking-[0.22em] mt-6"
-              style={{ color: "var(--cl-ink-faint)" }}
-            >
-              <span style={{ color: "#8a6a35" }}>{STATS.templatePct}%</span>{" "}
-              built on templates · {STATS.missingSchemaPct}% invisible to AI
-              assistants
-            </div>
-          </div>
+          {/* Category bars — flippable card. Front = diagnosis,
+              back = prescription (what we'd fix if hired). Toggles
+              on hover (desktop) or tap (touch). */}
+          <DiagnosisCard active={inView} />
         </div>
 
         {/* Verdict line */}
@@ -182,7 +152,7 @@ export default function FieldReport() {
               maxWidth: "26ch",
             }}
           >
-            &ldquo;A category that has not noticed the web changed.&rdquo;
+            &ldquo;Every business spends years building a brand. Then sends customers to a website that undoes it.&rdquo;
           </p>
           <div
             className="mt-6 text-[10px] uppercase tracking-[0.28em]"
@@ -205,7 +175,7 @@ export default function FieldReport() {
           </Link>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }
 
@@ -256,6 +226,134 @@ function Bar({
       >
         {value}
       </span>
+    </div>
+  );
+}
+
+/* ─── DiagnosisCard — flippable specimen ─────────────────────
+   Front = the category bar chart (diagnosis).
+   Back = the list of fixes we'd ship if hired (prescription).
+   Pure CSS 3D, no extra deps. Hover on desktop, tap on touch. */
+function DiagnosisCard({ active }: { active: boolean }) {
+  const [flipped, setFlipped] = useState(false);
+
+  const FIXES = [
+    { label: "Rebuild on Next.js + Vercel", impact: "Sub-1s LCP" },
+    { label: "Hand-coded type system, three weights", impact: "Identity restored" },
+    { label: "JSON-LD schema for AI assistants", impact: "Discoverable" },
+    { label: "Automate post-purchase journey", impact: "5h/week saved" },
+    { label: "Internal dashboard for inventory", impact: "Single source of truth" },
+  ];
+
+  return (
+    <div
+      className="diagnosis-card"
+      data-flipped={flipped ? "true" : "false"}
+      onMouseEnter={() => setFlipped(true)}
+      onMouseLeave={() => setFlipped(false)}
+      onClick={() => setFlipped((v) => !v)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          setFlipped((v) => !v);
+        }
+      }}
+      aria-label={
+        flipped
+          ? "Showing what we'd fix. Click to see the diagnosis again."
+          : "Showing diagnosis. Click to see what we'd fix."
+      }
+    >
+      {/* FRONT — diagnosis */}
+      <div className="diagnosis-card-face diagnosis-card-front space-y-7">
+        <div className="flex items-center justify-between">
+          <div
+            className="text-[10px] uppercase tracking-[0.28em]"
+            style={{ color: "var(--cl-ink-faint)" }}
+          >
+            Diagnosis · Average across the sample
+          </div>
+          <div
+            className="text-[10px] uppercase tracking-[0.28em]"
+            style={{
+              fontFamily: "var(--font-ibm-plex-mono), monospace",
+              color: "#8a6a35",
+            }}
+          >
+            Flip →
+          </div>
+        </div>
+        {CATEGORY_BARS.map((c, i) => (
+          <Bar
+            key={c.label}
+            label={c.label}
+            value={c.value}
+            delay={0.3 + i * 0.12}
+            active={active}
+          />
+        ))}
+        <div
+          className="text-[11px] uppercase tracking-[0.22em]"
+          style={{ color: "var(--cl-ink-faint)" }}
+        >
+          <span style={{ color: "#8a6a35" }}>100%</span> built on templates ·
+          100% invisible to AI assistants
+        </div>
+      </div>
+
+      {/* BACK — prescription */}
+      <div className="diagnosis-card-face diagnosis-card-back">
+        <div className="flex items-center justify-between mb-6">
+          <div
+            className="text-[10px] uppercase tracking-[0.28em]"
+            style={{ color: "var(--cl-ink-faint)" }}
+          >
+            Prescription · What we&rsquo;d ship
+          </div>
+          <div
+            className="text-[10px] uppercase tracking-[0.28em]"
+            style={{
+              fontFamily: "var(--font-ibm-plex-mono), monospace",
+              color: "#8a6a35",
+            }}
+          >
+            ← Diagnosis
+          </div>
+        </div>
+        <ul className="space-y-4">
+          {FIXES.map((f, i) => (
+            <li
+              key={i}
+              className="grid grid-cols-[auto_1fr_auto] gap-4 items-baseline pb-3 border-b"
+              style={{ borderColor: "var(--cl-stroke)" }}
+            >
+              <span
+                className="text-[10px] uppercase tracking-[0.22em]"
+                style={{
+                  fontFamily: "var(--font-ibm-plex-mono), monospace",
+                  color: "#8a6a35",
+                }}
+              >
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <span
+                className="text-[14px]"
+                style={{ color: "var(--cl-ink)" }}
+              >
+                {f.label}
+              </span>
+              <span
+                className="text-[10px] uppercase tracking-[0.22em] text-right"
+                style={{ color: "var(--cl-ink-faint)" }}
+              >
+                {f.impact}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }

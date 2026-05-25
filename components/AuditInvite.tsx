@@ -65,6 +65,9 @@ export default function AuditInvite() {
           viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: 0.9, ease: [0.2, 0.7, 0.2, 1] }}
         >
+          {/* Scanner ring — the audit, drawn. Twelve ticks for the
+              twelve signs; the sweeping arc reads as "in progress". */}
+          <ScannerRing />
           <div
             className="text-[10px] uppercase tracking-[0.32em] mb-6"
             style={{ color: "var(--cl-ink-faint)" }}
@@ -145,5 +148,59 @@ export default function AuditInvite() {
         </motion.form>
       </div>
     </section>
+  );
+}
+
+/* ─── Scanner dial — 12 ticks for 12 signs, a slow sweeping needle ─ */
+function ScannerRing() {
+  const ticks = Array.from({ length: 12 });
+  return (
+    <motion.svg
+      viewBox="0 0 100 100"
+      width="80"
+      height="80"
+      className="block mx-auto mb-7"
+      aria-hidden
+      initial={{ opacity: 0, scale: 0.9 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={{ once: true, amount: 0.5 }}
+      transition={{ duration: 0.9, ease: [0.2, 0.7, 0.2, 1] }}
+    >
+      {/* Faint outer dial */}
+      <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(26,22,18,0.14)" strokeWidth="0.6" />
+      {/* Inner ring — quieter, anchors the needle visually */}
+      <circle cx="50" cy="50" r="6" fill="none" stroke="rgba(138,106,53,0.25)" strokeWidth="0.6" />
+
+      {/* Twelve ticks — coords rounded so SSR + client serialise identically */}
+      {ticks.map((_, i) => {
+        const a = (i / 12) * Math.PI * 2 - Math.PI / 2;
+        const inner = i % 3 === 0 ? 30 : 33.5;
+        const x1 = (50 + Math.cos(a) * 38).toFixed(3);
+        const y1 = (50 + Math.sin(a) * 38).toFixed(3);
+        const x2 = (50 + Math.cos(a) * inner).toFixed(3);
+        const y2 = (50 + Math.sin(a) * inner).toFixed(3);
+        return (
+          <line
+            key={i}
+            x1={x1} y1={y1} x2={x2} y2={y2}
+            stroke="rgba(26,22,18,0.55)"
+            strokeWidth={i % 3 === 0 ? "1.1" : "0.6"}
+          />
+        );
+      })}
+
+      {/* Sweeping needle — single bronze line, anchored at center, tip at outer ring */}
+      <motion.line
+        x1="50" y1="50" x2="50" y2="14"
+        stroke="#8a6a35"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        style={{ transformOrigin: "50px 50px" }}
+        animate={{ rotate: 360 }}
+        transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+      />
+      {/* Center pin */}
+      <circle cx="50" cy="50" r="1.6" fill="#1a1612" />
+    </motion.svg>
   );
 }

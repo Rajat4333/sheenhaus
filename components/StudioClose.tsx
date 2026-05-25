@@ -38,14 +38,15 @@ export default function StudioClose() {
               margin: "0 auto",
             }}
           >
-            We take on <em>four engagements</em> at a time. Now booking Q3 2026.
+            The studio is <em>always open</em> for ambitious work.
           </h2>
           <p
             className="mt-8 text-[15px] max-w-md mx-auto"
             style={{ color: "var(--cl-ink-soft)" }}
           >
-            Mumbai · Dubai · New York · London. Begin with a twenty-minute
-            conversation or a direct line.
+            Working with three businesses at a time, end-to-end. Bring us
+            something cinematic, something automated, something that should
+            already exist.
           </p>
           <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
@@ -85,7 +86,7 @@ export default function StudioClose() {
               className="text-[10px] uppercase tracking-[0.28em]"
               style={{ color: "var(--cl-ink-faint)" }}
             >
-              © Sheenhaus {new Date().getFullYear()} · A digital studio for premium brands
+              © Sheenhaus {new Date().getFullYear()} · End-to-end tech for ambitious businesses
             </div>
           </div>
         </div>
@@ -93,3 +94,4 @@ export default function StudioClose() {
     </section>
   );
 }
+

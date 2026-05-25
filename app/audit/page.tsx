@@ -261,10 +261,13 @@ export default function AuditPage() {
         )}
 
         {loading && (
-          <p className="mt-6 font-mono text-[11px] uppercase tracking-[0.22em] text-text-faint max-w-3xl">
-            Fetching the site · Running Lighthouse · Cross-checking signs &mdash;
-            this usually takes 15&ndash;30 seconds.
-          </p>
+          <div className="mt-10 flex flex-col items-start gap-5 max-w-3xl">
+            <ScannerDial />
+            <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-text-faint">
+              Fetching the site · Running Lighthouse · Cross-checking signs &mdash;
+              this usually takes 15&ndash;30 seconds.
+            </p>
+          </div>
         )}
       </section>
 
@@ -317,6 +320,57 @@ export default function AuditPage() {
       )}
       </div>
     </main>
+  );
+}
+
+/* ─── Scanner dial — shown while the audit is running ────────────────
+   Twelve ticks for the twelve signs; a bronze needle sweeps the
+   dial. The same dial appears on the homepage AuditInvite, sized
+   smaller. Here it earns its full presence: this IS the audit
+   visualised. */
+function ScannerDial() {
+  const ticks = Array.from({ length: 12 });
+  return (
+    <svg
+      viewBox="0 0 100 100"
+      width="120"
+      height="120"
+      aria-hidden
+      className="block"
+    >
+      <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(26,22,18,0.14)" strokeWidth="0.6" />
+      <circle cx="50" cy="50" r="6" fill="none" stroke="rgba(138,106,53,0.25)" strokeWidth="0.6" />
+      {ticks.map((_, i) => {
+        const a = (i / 12) * Math.PI * 2 - Math.PI / 2;
+        const inner = i % 3 === 0 ? 30 : 33.5;
+        const x1 = (50 + Math.cos(a) * 38).toFixed(3);
+        const y1 = (50 + Math.sin(a) * 38).toFixed(3);
+        const x2 = (50 + Math.cos(a) * inner).toFixed(3);
+        const y2 = (50 + Math.sin(a) * inner).toFixed(3);
+        return (
+          <line
+            key={i}
+            x1={x1} y1={y1} x2={x2} y2={y2}
+            stroke="rgba(26,22,18,0.55)"
+            strokeWidth={i % 3 === 0 ? "1.1" : "0.6"}
+          />
+        );
+      })}
+      <line
+        x1="50" y1="50" x2="50" y2="14"
+        stroke="#8a6a35"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        style={{ transformOrigin: "50px 50px", animation: "audit-dial-sweep 4s linear infinite" }}
+      />
+      <circle cx="50" cy="50" r="1.6" fill="#1a1612" />
+      <style>{`
+        @keyframes audit-dial-sweep {
+          from { transform: rotate(0deg); }
+          to   { transform: rotate(360deg); }
+        }
+      `}</style>
+    </svg>
   );
 }
 

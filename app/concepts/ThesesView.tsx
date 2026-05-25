@@ -1,7 +1,11 @@
 "use client";
 import { useMemo, useState } from "react";
-import Image from "next/image";
 import { THESES, SECTORS, CRAFTS, type Sector, type Craft } from "./theses-data";
+import Plate from "./Plate";
+
+type PlateSlug = "slowness" | "ai-presence" | "considered-detail" | "trust-through-restraint";
+const PLATE_SLUGS: readonly PlateSlug[] = ["slowness", "ai-presence", "considered-detail", "trust-through-restraint"];
+const isPlateSlug = (s: string): s is PlateSlug => (PLATE_SLUGS as readonly string[]).includes(s);
 
 function readInitial<T extends string>(
   key: string,
@@ -145,56 +149,28 @@ export default function ThesesView() {
                   ))}
                 </div>
 
-                {/* Concept visual — real photograph, treated */}
-                <div
-                  className="relative w-full aspect-[16/9] mt-16 overflow-hidden rounded-sm"
-                  style={{
-                    background: t.swatch,
-                    boxShadow: "0 30px 80px -20px rgba(26, 22, 18, 0.18)",
-                  }}
-                >
-                  <Image
-                    src={t.photo}
-                    alt={t.photoAlt}
-                    fill
-                    sizes="(min-width: 1024px) 65vw, 100vw"
-                    className="object-cover"
-                    style={{
-                      filter: "grayscale(0.35) contrast(1.05) brightness(0.92)",
-                    }}
-                  />
-                  {/* Warm bronze wash — ties photography to palette */}
-                  <div
-                    className="absolute inset-0 mix-blend-multiply pointer-events-none"
-                    style={{
-                      background:
-                        "linear-gradient(135deg, rgba(42,31,23,0.25) 0%, rgba(117,88,43,0.18) 100%)",
-                    }}
-                  />
-                  {/* Subtle film grain */}
-                  <div
-                    className="absolute inset-0 mix-blend-overlay opacity-30 pointer-events-none"
-                    style={{
-                      backgroundImage:
-                        "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.92' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.5'/%3E%3C/svg%3E\")",
-                    }}
-                  />
-                  {/* Bottom gradient anchors the caption */}
-                  <div
-                    className="absolute inset-x-0 bottom-0 h-1/2 pointer-events-none"
-                    style={{
-                      background:
-                        "linear-gradient(to top, rgba(20,17,14,0.85) 0%, rgba(20,17,14,0) 100%)",
-                    }}
-                  />
-                  <div className="absolute inset-0 flex items-end p-10">
-                    <span
-                      className="font-serif italic text-2xl md:text-3xl tracking-[-0.02em] max-w-[20ch] leading-tight"
-                      style={{ color: "#f0ebe0" }}
+                {/* Concept Plate — bespoke generative visual instead of
+                    a treated stock photograph. Sign 04 calls out stock
+                    photography; the studio refuses to use it itself. */}
+                <div className="mt-16">
+                  {isPlateSlug(t.slug) ? (
+                    <Plate slug={t.slug} />
+                  ) : (
+                    // Defensive fallback for any future thesis without a Plate yet
+                    <div
+                      className="relative w-full aspect-[16/9] rounded-sm flex items-center justify-center"
+                      style={{
+                        background: t.swatch,
+                        border: "1px solid var(--cl-stroke)",
+                      }}
                     >
-                      {t.claim}
-                    </span>
-                  </div>
+                      <span
+                        className="font-serif italic text-2xl text-text-mid"
+                      >
+                        {t.claim}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Practice list */}

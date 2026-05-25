@@ -123,6 +123,12 @@ html[data-hours="after"] .theme-clinical {
   --cl-bg: #fdfbf6;
 }
 
+/* Custom cursor — hide native on fine-pointer (mouse) devices.
+   MagneticCursor renders the replacement dot + ring in JS.
+   Coarse-pointer (touch) keeps the default browser cursor. */
+@media (pointer: fine) {
+  *, *::before, *::after { cursor: none !important; }
+}
 /* Restore default cursor on touch / coarse pointers */
 @media (hover: none), (pointer: coarse) {
   body { cursor: auto; }
@@ -151,18 +157,6 @@ em, blockquote,
   font-synthesis: none;
 }
 
-/* ── Grain overlay ──────────────────────────────────────────── */
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 9999;
-  mix-blend-mode: multiply;
-  opacity: 0.5;
-}
-
 /* ── Scrollbar — neutral grey on white ───────────────────────── */
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: #ffffff; }
@@ -177,15 +171,65 @@ body::after {
 /* Reusable utility classes                                      */
 /* ───────────────────────────────────────────────────────────── */
 
+/* ── Diagnosis card — 3D flip ───────────────────────────────
+   Two faces stacked in 3D space; the parent rotates 180° around
+   the Y axis. Each face uses backface-visibility: hidden so
+   only the front-facing one paints. Pure CSS, no deps.
+
+   The card is positioned over the bar chart so the back face
+   matches the front in size. */
+.diagnosis-card {
+  position: relative;
+  width: 100%;
+  min-height: 360px;
+  perspective: 1400px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.diagnosis-card-face {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transition: transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
+  transform-style: preserve-3d;
+}
+.diagnosis-card-front {
+  transform: rotateY(0deg);
+}
+.diagnosis-card-back {
+  transform: rotateY(180deg);
+}
+.diagnosis-card[data-flipped="true"] .diagnosis-card-front {
+  transform: rotateY(-180deg);
+}
+.diagnosis-card[data-flipped="true"] .diagnosis-card-back {
+  transform: rotateY(0deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .diagnosis-card-face { transition: none; }
+}
+
 /* ── Sign number — ink fills from bottom on scroll ─────────
    The big "01–12" numerals in the SignsReel start as a faint
-   grey and fill with ink from the bottom as the user scrolls
-   through that sign's segment. Driven by the CSS variable
-   --fill (a 0–100% string) which framer-motion updates.
+   grey and fill with ink from the bottom as the user scrolls.
+   Driven by the CSS variable --fill (a 0-100% string) which
+   framer-motion updates on desktop, and a CSS transition
+   updates on mobile (via useInView).
 
    We use a two-stop gradient (ink → faint-grey, not ink →
    transparent), so curved glyphs like 0/6/8/9 don't show
-   weird inner cutouts when partially filled. */
+   weird inner cutouts when partially filled.
+
+   Registering --fill via @property gives mobile CSS transitions
+   real animation; otherwise it'd snap from 0% to 100%. */
+@property --fill {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
 .sign-number {
   background: linear-gradient(
     to top,
@@ -335,18 +379,15 @@ a[data-link-style="bronze"]:hover {
   background: #ffffff;
   z-index: 100;
   pointer-events: none;
-  /* React unmounts the veil when the page is paint-ready (min 800ms).
-     We just fade the whole thing out as it leaves. */
-  animation: veil-fade-out 0.5s cubic-bezier(0.7, 0, 0.2, 1) forwards;
-  animation-delay: 0.6s;
+  /* React unmounts the veil when the page is paint-ready (min 100ms).
+     Quick fade so the wordmark is barely a blink. */
+  animation: veil-fade-out 0.3s cubic-bezier(0.7, 0, 0.2, 1) forwards;
 }
 
 .page-veil-mark {
   position: absolute;
   top: 50%;
   left: 50%;
-  /* Wordmark matches the floating-pill nav: lowercase Satoshi sans
-     with the gradient sphere on the left. Seamless veil → page. */
   display: inline-flex;
   align-items: center;
   gap: 10px;
@@ -356,10 +397,8 @@ a[data-link-style="bronze"]:hover {
   letter-spacing: -0.015em;
   line-height: 1;
   color: #1a1a1a;
-  opacity: 0;
+  opacity: 1;
   transform: translate(-50%, -50%);
-  animation: veil-mark-in 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
-  animation-delay: 0.1s;
 }
 .page-veil-dot {
   display: inline-block;
@@ -369,10 +408,6 @@ a[data-link-style="bronze"]:hover {
   background: linear-gradient(135deg, #1a1a1a 0%, #4a4a4a 60%, #c9b89e 100%);
 }
 
-@keyframes veil-mark-in {
-  0%   { opacity: 0; transform: translate(-50%, calc(-50% + 6px)); }
-  100% { opacity: 1; transform: translate(-50%, -50%); }
-}
 @keyframes veil-fade-out {
   0%   { opacity: 1; }
   100% { opacity: 0; }
@@ -380,9 +415,27 @@ a[data-link-style="bronze"]:hover {
 
 .page-rise {
   opacity: 0;
-  animation: page-rise 1.4s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
-  /* Content begins rising as the veil lifts (parallel reveal) */
-  animation-delay: 2.0s;
+  animation: page-rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+}
+
+/* ── Reveal-in — replaces simple framer-motion mount fades.
+   `--reveal-delay` lets each instance stagger its own start. */
+.reveal-in {
+  opacity: 0;
+  transform: translateY(8px);
+  animation: reveal-in 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+  animation-delay: var(--reveal-delay, 0s);
+}
+@keyframes reveal-in {
+  0%   { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal-in {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
 }
 
 /* ── Buttons ───────────────────────────────────────────────── */
@@ -448,101 +501,7 @@ a[data-link-style="bronze"]:hover {
 @media (min-width: 768px) { .section-pad { padding-top: 160px; padding-bottom: 160px; } }
 
 /* ──────────────────────────────────────────────────────────── */
-/* SaaS hero experiment — scoped tokens                          */
-/*                                                                */
-/* Only applies inside .theme-saas so the existing cream/bronze   */
-/* palette is untouched everywhere else. Lets us A/B the hero     */
-/* without forking the codebase — remove .theme-saas from the     */
-/* hero wrapper to revert.                                        */
-/* ──────────────────────────────────────────────────────────── */
-.theme-saas {
-  --saas-bg: hsl(0 0% 100%);
-  --saas-fg: hsl(210 14% 17%);
-  --saas-muted: hsl(0 0% 96%);
-  --saas-muted-fg: hsl(184 5% 55%);
-  --saas-accent: hsl(239 84% 67%);
-  --saas-accent-fg: hsl(0 0% 100%);
-  --saas-border: hsl(0 0% 90%);
-  --saas-shadow-dashboard:
-    0 25px 80px -12px rgba(0, 0, 0, 0.08),
-    0 0 0 1px rgba(0, 0, 0, 0.06);
-
-  background: var(--saas-bg);
-  color: var(--saas-fg);
-  font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
-}
-.theme-saas .font-display {
-  font-family: var(--font-instrument-serif), 'Instrument Serif', Georgia, serif;
-  font-style: normal;
-  font-weight: 400;
-}
-.theme-saas .font-display em {
-  font-style: italic;
-  font-weight: 400;
-}
-.theme-saas .font-body {
-  font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
-}
-
-/* ──────────────────────────────────────────────────────────── */
-/* Dark portfolio experiment — scoped tokens                     */
-/* ──────────────────────────────────────────────────────────── */
-.theme-portfolio {
-  --pf-bg: hsl(0 0% 4%);
-  --pf-surface: hsl(0 0% 8%);
-  --pf-text: hsl(0 0% 96%);
-  --pf-muted: hsl(0 0% 53%);
-  --pf-stroke: hsl(0 0% 12%);
-  --pf-accent-gradient: linear-gradient(90deg, #89AACC 0%, #4E85BF 100%);
-
-  background: var(--pf-bg);
-  color: var(--pf-text);
-  font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
-  /* Selection stays off globally — matches the rest of the site. */
-}
-.theme-portfolio .pf-display {
-  font-family: var(--font-instrument-serif), 'Instrument Serif', Georgia, serif;
-  font-style: italic;
-  font-weight: 400;
-}
-.theme-portfolio .pf-accent-grad-bg {
-  background: var(--pf-accent-gradient);
-}
-.theme-portfolio .pf-accent-grad-text {
-  background: var(--pf-accent-gradient);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-/* Animated gradient border ring used on hover-CTAs */
-@keyframes pf-gradient-shift {
-  0%   { background-position:   0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position:   0% 50%; }
-}
-.theme-portfolio .pf-ring-grad {
-  background: linear-gradient(90deg, #89AACC 0%, #4E85BF 50%, #89AACC 100%);
-  background-size: 200% 100%;
-  animation: pf-gradient-shift 6s ease infinite;
-}
-/* Scroll-down indicator line animation */
-@keyframes pf-scroll-down {
-  0%   { transform: translateY(-100%); }
-  100% { transform: translateY(200%); }
-}
-.theme-portfolio .pf-animate-scroll-down {
-  animation: pf-scroll-down 1.5s ease-in-out infinite;
-}
-@keyframes pf-role-fade-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.theme-portfolio .pf-animate-role-fade-in {
-  animation: pf-role-fade-in 0.4s ease-out;
-}
-
-/* ──────────────────────────────────────────────────────────── */
-/* Avon-style clinical white scheme — scoped tokens             */
+/* Clinical white scheme — scoped tokens                        */
 /* Pure white surface, sans headline, soft pearlescent halo     */
 /* behind a "specimen card" that holds real product data.       */
 /* ──────────────────────────────────────────────────────────── */
