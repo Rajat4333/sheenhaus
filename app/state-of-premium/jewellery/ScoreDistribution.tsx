@@ -47,7 +47,8 @@ export default function ScoreDistribution({ rows }: { rows: Row[] }) {
 
   return (
     <div ref={ref} className="relative">
-      <div className="grid grid-cols-5 gap-3 md:gap-6 items-end h-[280px] md:h-[340px]">
+      <div className="overflow-x-auto -mx-6 px-6 md:mx-0 md:px-0">
+      <div className="grid grid-cols-5 gap-3 md:gap-6 items-end h-[280px] md:h-[340px] min-w-[480px] md:min-w-0">
         {buckets.map((b, i) => {
           const count = b.members.length;
           const heightPct = (count / maxCount) * 100;
@@ -94,6 +95,7 @@ export default function ScoreDistribution({ rows }: { rows: Row[] }) {
             </button>
           );
         })}
+      </div>
       </div>
 
       {/* Hover detail panel — replaces the chart's caption with the

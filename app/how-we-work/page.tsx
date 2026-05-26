@@ -27,7 +27,7 @@ export default function HowWeWork() {
       <section className="relative z-10 shell pt-40 sm:pt-48 md:pt-56 pb-12 max-w-4xl">
         <div className="inline-flex items-center gap-3">
           <span className="w-6 h-px bg-accent" />
-          <span className="font-mono text-[12px] uppercase tracking-[0.2em] text-text-mid whitespace-nowrap">
+          <span className="font-mono text-[12px] uppercase tracking-[0.2em] text-text-mid">
             How we work · The studio operating model
           </span>
         </div>
@@ -158,7 +158,7 @@ export default function HowWeWork() {
               Pacific morning. Live calls are scheduled in your time zone,
               never ours.
             </p>
-            <table className="mt-8 w-full font-mono text-[11px] uppercase tracking-[0.18em] text-text-faint">
+            <table className="mt-8 w-full font-mono text-[11px] uppercase tracking-[0.12em] md:tracking-[0.18em] text-text-faint">
               <tbody className="border-t border-border">
                 <tr className="border-b border-border">
                   <td className="py-3 pr-4">London / Dubai</td>

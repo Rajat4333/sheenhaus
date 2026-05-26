@@ -72,7 +72,7 @@ export default function SignPrevalence({ rows }: { rows: Row[] }) {
                 className="block group"
                 aria-label={`Read the essay on sign ${s.num}: ${s.title}`}
               >
-                <div className="grid grid-cols-[40px_1fr_60px] gap-4 md:gap-6 items-baseline">
+                <div className="grid grid-cols-[28px_1fr_44px] gap-3 md:grid-cols-[40px_1fr_60px] md:gap-6 items-baseline">
                   <span className="font-mono text-[11px] tracking-[0.18em] text-text-dim">
                     {s.num}
                   </span>
@@ -83,7 +83,7 @@ export default function SignPrevalence({ rows }: { rows: Row[] }) {
                     {s.pct}%
                   </span>
                 </div>
-                <div className="mt-3 ml-[56px] md:ml-[64px] h-px bg-border overflow-hidden">
+                <div className="mt-3 ml-[40px] md:ml-[64px] h-px bg-border overflow-hidden">
                   <motion.div
                     className="h-full origin-left"
                     style={{
@@ -107,7 +107,7 @@ export default function SignPrevalence({ rows }: { rows: Row[] }) {
                   />
                 </div>
                 {isHovered && s.hits.length > 0 && (
-                  <div className="mt-3 ml-[56px] md:ml-[64px]">
+                  <div className="mt-3 ml-[40px] md:ml-[64px]">
                     <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-text-faint">
                       {s.hits
                         .map((h) => {

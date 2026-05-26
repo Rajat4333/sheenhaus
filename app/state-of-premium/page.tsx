@@ -78,7 +78,7 @@ export default function StateOfPremiumIndex() {
       <section className="relative z-10 shell pt-40 sm:pt-48 md:pt-56 pb-16 max-w-4xl">
         <div className="inline-flex items-center gap-3">
           <span className="w-6 h-px bg-accent" />
-          <span className="font-mono text-[12px] uppercase tracking-[0.2em] text-text-mid whitespace-nowrap">
+          <span className="font-mono text-[12px] uppercase tracking-[0.2em] text-text-mid">
             The Audit · A periodic series
           </span>
         </div>

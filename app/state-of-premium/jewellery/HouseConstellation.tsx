@@ -71,7 +71,7 @@ export default function HouseConstellation({ rows }: { rows: Row[] }) {
       transition={{ duration: 1.0, ease: [0.2, 0.7, 0.2, 1] }}
       className="mt-12 max-w-3xl"
     >
-      <div className="flex items-center justify-between mb-3 gap-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-3 gap-2 md:gap-6">
         <span className="font-mono text-[10px] uppercase tracking-[0.26em] text-text-faint">
           Constellation · The seven houses
         </span>
@@ -80,9 +80,11 @@ export default function HouseConstellation({ rows }: { rows: Row[] }) {
         </span>
       </div>
 
+      <div className="overflow-x-auto -mx-6 px-6 md:mx-0 md:px-0">
       <svg
         viewBox={`0 0 ${W} ${H}`}
         width="100%"
+        style={{ minWidth: 560 }}
         className="block"
         aria-label="A scatter of seven jewellery houses showing market cap versus Sheenhaus audit score."
       >
@@ -262,6 +264,7 @@ export default function HouseConstellation({ rows }: { rows: Row[] }) {
           SMALLEST →
         </text>
       </svg>
+      </div>
 
       <figcaption className="mt-4 text-[12px] leading-[1.7] text-text-mid italic font-serif max-w-[60ch]">
         Dot size scales with market capitalisation. The largest house, by some
