@@ -7,6 +7,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ClinicalNavbar from "@/components/ClinicalNavbar";
+import ClinicalFooter from "@/components/ClinicalFooter";
 import dataset from "@/data/jewellery-listed-2026.json";
 import { type Dataset, type Row, isAudit, isUnreachable } from "./types";
 import CountUp from "./CountUp";
@@ -332,6 +333,7 @@ export default function JewelleryStatePage() {
           ← Back to the studio
         </Link>
       </section>
+      <ClinicalFooter />
     </main>
   );
 }

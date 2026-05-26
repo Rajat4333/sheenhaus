@@ -22,6 +22,15 @@ export default function ScoreDistribution({ rows }: { rows: Row[] }) {
   const inView = useInView(ref, { once: true, amount: 0.3 });
   const [hover, setHover] = useState<number | null>(null);
 
+  /* Canonical market-cap rank — same anonymisation policy as the rest
+     of the report. House 01 = largest by market cap. */
+  const rankByDomain = useMemo(() => {
+    const byMcap = [...rows].sort(
+      (a, b) => b.brand.marketCapCr - a.brand.marketCapCr
+    );
+    return new Map(byMcap.map((r, i) => [r.brand.domain, i + 1]));
+  }, [rows]);
+
   const buckets = useMemo(() => {
     return BANDS.map((b) => {
       const members = rows
@@ -96,17 +105,20 @@ export default function ScoreDistribution({ rows }: { rows: Row[] }) {
               {buckets[hover].label} · {buckets[hover].tone}
             </span>
             <ul className="mt-3 flex flex-wrap gap-x-6 gap-y-2">
-              {buckets[hover].members.map((m) => (
+              {buckets[hover].members.map((m) => {
+                const rank = rankByDomain.get(m.brand.domain) ?? 0;
+                return (
                 <li
                   key={m.brand.domain}
                   className="font-serif text-base md:text-lg text-text"
                 >
-                  {m.brand.displayName}
+                  House {String(rank).padStart(2, "0")}
                   <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-text-faint ml-2">
                     {isAudit(m.audit) && m.audit.score} / 100
                   </span>
                 </li>
-              ))}
+                );
+              })}
             </ul>
           </div>
         ) : (

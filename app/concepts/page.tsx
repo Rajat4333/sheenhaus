@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import ClinicalNavbar from "@/components/ClinicalNavbar";
+import ClinicalFooter from "@/components/ClinicalFooter";
 import ThesesView from "./ThesesView";
 
 const CAL_LINK = "https://cal.com/sheenhaus-yseo4c";
@@ -72,6 +73,7 @@ export default function ConceptsPage() {
           </Link>
         </div>
       </section>
+      <ClinicalFooter />
     </main>
   );
 }

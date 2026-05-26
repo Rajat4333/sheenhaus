@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import ClinicalNavbar from "@/components/ClinicalNavbar";
+import ClinicalFooter from "@/components/ClinicalFooter";
 import { useInView } from "framer-motion";
 import { useRef } from "react";
 
@@ -394,6 +395,7 @@ export default function SignsPage() {
           ← Back to the studio
         </Link>
       </section>
+      <ClinicalFooter />
     </main>
   );
 }

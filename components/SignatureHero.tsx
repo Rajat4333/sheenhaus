@@ -32,10 +32,10 @@ const DraftingGrid = dynamic(
 const CAL_LINK = "https://cal.com/sheenhaus-yseo4c";
 
 const NAV = [
-  { href: "/state-of-premium/jewellery", label: "WORK" },
-  { href: "/signs", label: "DIAGNOSTIC" },
+  { href: "/state-of-premium", label: "WORK" },
+  { href: "/how-we-work", label: "PROCESS" },
   { href: "/audit", label: "AUDIT" },
-  { href: "/concepts", label: "THESES" },
+  { href: "/contact", label: "CONTACT" },
 ];
 
 export default function SignatureHero() {

@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import ClinicalNavbar from "@/components/ClinicalNavbar";
+import ClinicalFooter from "@/components/ClinicalFooter";
 
 const CAL_LINK = "https://cal.com/sheenhaus-yseo4c";
 
@@ -254,6 +255,17 @@ export default function AuditPage() {
           </button>
         </form>
 
+        {/* Pre-submit terms — restrained, single line so it never gets
+            in the way of the input but makes the acceptable-use
+            agreement explicit. */}
+        <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.18em] text-text-faint max-w-3xl leading-[1.7]">
+          By running the audit you confirm you have authority over the URL, or
+          that the URL is publicly accessible and your use is for editorial /
+          diagnostic purposes only. We do not share the audit data with third
+          parties. Scores are one studio&rsquo;s opinion &mdash; see the full
+          notice below the results.
+        </p>
+
         {error && (
           <p className="mt-6 font-mono text-[12px] uppercase tracking-[0.18em] text-text-mid max-w-3xl">
             <span style={{ color: "var(--color-accent)" }}>—</span> {error}
@@ -319,6 +331,7 @@ export default function AuditPage() {
         </section>
       )}
       </div>
+      <ClinicalFooter />
     </main>
   );
 }
@@ -688,6 +701,21 @@ function AuditResultDisplay({ result }: { result: AuditResult }) {
                 {emailError}
               </p>
             )}
+            {/* Email-privacy line — restrained, sits below the form so
+                it doesn't crowd the input but makes the data-use
+                agreement explicit. */}
+            <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.18em] text-text-faint max-w-2xl leading-[1.7]">
+              We use your email only to send this one report. No newsletter,
+              no marketing list, no resale. You can request deletion any time
+              by replying to the report email or writing to{" "}
+              <a
+                href="mailto:hello@sheenhaus.com"
+                className="text-accent underline-offset-4 hover:underline"
+              >
+                hello@sheenhaus.com
+              </a>
+              .
+            </p>
           </>
         )}
       </div>

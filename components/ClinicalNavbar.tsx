@@ -7,30 +7,13 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import dynamic from "next/dynamic";
 import { useState } from "react";
 
-/* 3D pearlescent wordmark sphere — same one used in the hero pill.
-   Lazy-loaded; 2D gradient dot is the fallback until three.js arrives. */
-const WordmarkSphere = dynamic(() => import("@/components/WordmarkSphere"), {
-  ssr: false,
-  loading: () => (
-    <span
-      className="inline-block w-3.5 h-3.5 rounded-full"
-      style={{
-        background:
-          "linear-gradient(135deg, #1a1a1a 0%, #4a4a4a 60%, #c9b89e 100%)",
-      }}
-      aria-hidden="true"
-    />
-  ),
-});
-
 const NAV = [
-  { href: "/state-of-premium/jewellery", label: "WORK" },
-  { href: "/signs", label: "DIAGNOSTIC" },
+  { href: "/state-of-premium", label: "WORK" },
+  { href: "/how-we-work", label: "PROCESS" },
   { href: "/audit", label: "AUDIT" },
-  { href: "/concepts", label: "THESES" },
+  { href: "/contact", label: "CONTACT" },
 ];
 
 const CAL_LINK = "https://cal.com/sheenhaus-yseo4c";
@@ -51,12 +34,11 @@ export default function ClinicalNavbar() {
             boxShadow: "0 4px 24px -8px rgba(0,0,0,0.06)",
           }}
         >
-          {/* Wordmark */}
+          {/* Wordmark — text only, no logo dot */}
           <Link
             href="/"
-            className="inline-flex items-center gap-2 pl-3 pr-3 py-1.5"
+            className="inline-flex items-center pl-3 pr-3 py-1.5"
           >
-            <WordmarkSphere size={14} />
             <span
               className="text-sm tracking-tight"
               style={{ color: "var(--cl-ink)" }}

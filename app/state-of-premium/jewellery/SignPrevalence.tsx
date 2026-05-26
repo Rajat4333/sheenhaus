@@ -29,6 +29,14 @@ export default function SignPrevalence({ rows }: { rows: Row[] }) {
   const inView = useInView(ref, { once: true, amount: 0.2 });
   const [hover, setHover] = useState<string | null>(null);
 
+  /* Canonical market-cap rank — anonymisation policy applied here too. */
+  const rankByDomain = useMemo(() => {
+    const byMcap = [...rows].sort(
+      (a, b) => b.brand.marketCapCr - a.brand.marketCapCr
+    );
+    return new Map(byMcap.map((r, i) => [r.brand.domain, i + 1]));
+  }, [rows]);
+
   const data = useMemo(() => {
     const auditable = rows.filter((r) => isAudit(r.audit));
     const total = auditable.length || 1;
@@ -102,7 +110,10 @@ export default function SignPrevalence({ rows }: { rows: Row[] }) {
                   <div className="mt-3 ml-[56px] md:ml-[64px]">
                     <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-text-faint">
                       {s.hits
-                        .map((h) => h.brand.displayName)
+                        .map((h) => {
+                          const rank = rankByDomain.get(h.brand.domain) ?? 0;
+                          return `House ${String(rank).padStart(2, "0")}`;
+                        })
                         .slice(0, 4)
                         .join(" · ")}
                       {s.hits.length > 4 && ` · +${s.hits.length - 4} more`}

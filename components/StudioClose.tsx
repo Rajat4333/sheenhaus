@@ -65,16 +65,8 @@ export default function StudioClose() {
 
         {/* Footer hairline + mark */}
         <div className="mt-32 pt-10 border-t" style={{ borderColor: "var(--cl-stroke)" }}>
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <Link href="/" className="inline-flex items-center gap-2">
-              <span
-                className="inline-block w-3 h-3 rounded-full"
-                style={{
-                  background:
-                    "linear-gradient(135deg, #1a1a1a 0%, #4a4a4a 60%, #c9b89e 100%)",
-                }}
-                aria-hidden
-              />
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <Link href="/" className="inline-flex items-center">
               <span
                 className="text-[13px] tracking-tight"
                 style={{ color: "var(--cl-ink)" }}
@@ -88,17 +80,34 @@ export default function StudioClose() {
             >
               © Sheenhaus {new Date().getFullYear()} · End-to-end tech for ambitious businesses
             </div>
-            {/* Editorial / trademark notice — kept restrained so the
-                hero footer stays elegant. Protects published reports
-                that name third-party brands. */}
-            <div
-              className="text-[9px] tracking-[0.18em] uppercase max-w-md leading-[1.7] mt-1"
-              style={{ color: "var(--cl-ink-faint)", opacity: 0.6 }}
+            <nav
+              className="flex items-center gap-5 text-[10px] uppercase tracking-[0.22em]"
+              style={{ color: "var(--cl-ink-faint)" }}
+              aria-label="Legal"
             >
-              All third-party brand names and trademarks remain the property
-              of their respective owners. Published audits are editorial
-              commentary on public information.
-            </div>
+              <Link href="/legal#privacy" className="hover:opacity-100 opacity-80 transition-opacity">
+                Privacy
+              </Link>
+              <span aria-hidden style={{ opacity: 0.4 }}>·</span>
+              <Link href="/legal#terms" className="hover:opacity-100 opacity-80 transition-opacity">
+                Terms
+              </Link>
+              <span aria-hidden style={{ opacity: 0.4 }}>·</span>
+              <Link href="/legal" className="hover:opacity-100 opacity-80 transition-opacity">
+                Legal
+              </Link>
+            </nav>
+          </div>
+          {/* Trademark / editorial notice — sits below the row so it
+              wraps cleanly on narrow viewports without crushing the
+              footer-link nav. */}
+          <div
+            className="text-[9px] tracking-[0.18em] uppercase max-w-2xl leading-[1.7] mt-8"
+            style={{ color: "var(--cl-ink-faint)", opacity: 0.6 }}
+          >
+            All third-party brand names and trademarks remain the property
+            of their respective owners. Published audits are editorial
+            commentary on public information.
           </div>
         </div>
       </div>
