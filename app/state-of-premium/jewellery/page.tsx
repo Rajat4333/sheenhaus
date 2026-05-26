@@ -13,6 +13,7 @@ import CountUp from "./CountUp";
 import ScoreDistribution from "./ScoreDistribution";
 import SignPrevalence from "./SignPrevalence";
 import BrandTable from "./BrandTable";
+import HouseConstellation from "./HouseConstellation";
 
 const CAL_LINK = "https://cal.com/sheenhaus-yseo4c";
 const TYPED_DATASET = dataset as unknown as Dataset;
@@ -114,6 +115,9 @@ export default function JewelleryStatePage() {
           seven breaks 60. The country&rsquo;s largest house refuses to be
           audited at all. What follows is what the data shows.
         </p>
+
+        {/* Constellation — the entire category, in one image. */}
+        <HouseConstellation rows={rows} />
       </section>
 
       <div className="shell">
@@ -124,9 +128,7 @@ export default function JewelleryStatePage() {
       <section className="relative z-10 shell section-pad">
         <div className="grid md:grid-cols-[1fr_2fr] gap-12 md:gap-20 items-start">
           <div>
-            <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-text-faint">
-              The verdict
-            </span>
+            <ChapterMark numeral="I" label="The verdict" />
             <h2 className="display-serif font-serif text-[clamp(2rem,5vw,3.5rem)] leading-[1.1] tracking-[-0.025em] mt-6 max-w-[18ch]">
               A category that has not noticed{" "}
               <em className="italic-accent">the web changed.</em>
@@ -163,9 +165,7 @@ export default function JewelleryStatePage() {
 
       {/* SCORE DISTRIBUTION */}
       <section className="relative z-10 shell section-pad">
-        <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-text-faint">
-          Distribution
-        </span>
+        <ChapterMark numeral="II" label="Distribution" />
         <h2 className="display-serif font-serif text-[clamp(2rem,5vw,3.5rem)] leading-[1.1] tracking-[-0.025em] mt-6 max-w-[24ch]">
           The whole sample sits in the lower half of the scale.
         </h2>
@@ -187,9 +187,7 @@ export default function JewelleryStatePage() {
 
       {/* SIGN PREVALENCE */}
       <section className="relative z-10 shell section-pad">
-        <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-text-faint">
-          The twelve signs · prevalence
-        </span>
+        <ChapterMark numeral="III" label="The twelve signs · prevalence" />
         <h2 className="display-serif font-serif text-[clamp(2rem,5vw,3.5rem)] leading-[1.1] tracking-[-0.025em] mt-6 max-w-[24ch]">
           The same patterns repeat across every house.
         </h2>
@@ -210,9 +208,7 @@ export default function JewelleryStatePage() {
 
       {/* PER-BRAND TABLE */}
       <section className="relative z-10 shell section-pad">
-        <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-text-faint">
-          The houses, in order
-        </span>
+        <ChapterMark numeral="IV" label="The houses, in order" />
         <h2 className="display-serif font-serif text-[clamp(2rem,5vw,3.5rem)] leading-[1.1] tracking-[-0.025em] mt-6 max-w-[24ch]">
           The audit, side by side with the balance sheet.
         </h2>
@@ -295,6 +291,28 @@ export default function JewelleryStatePage() {
         </Link>
       </section>
     </main>
+  );
+}
+
+/* ─── ChapterMark — small Roman numeral + label, like a printed report ─ */
+function ChapterMark({ numeral, label }: { numeral: string; label: string }) {
+  return (
+    <div className="inline-flex items-baseline gap-4">
+      <span
+        className="display-serif font-serif"
+        style={{
+          fontSize: "clamp(1.5rem, 2.2vw, 2rem)",
+          lineHeight: 1,
+          letterSpacing: "-0.02em",
+          color: "#8a6a35",
+        }}
+      >
+        {numeral}
+      </span>
+      <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-text-faint">
+        {label}
+      </span>
+    </div>
   );
 }
 

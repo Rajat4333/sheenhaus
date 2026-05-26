@@ -175,7 +175,7 @@ function ParticleField({ count = 220 }: { count?: number }) {
 }
 
 /* ─── Group: full orbital rig, parallax-tilted ──────────────── */
-function OrbitalRig() {
+function OrbitalRig({ orbitalOnly = false }: { orbitalOnly?: boolean }) {
   const group = useRef<THREE.Group>(null);
   const target = useRef({ x: 0, y: 0 });
 
@@ -202,7 +202,9 @@ function OrbitalRig() {
       <ParticleField />
       <GoldRing />
       <ThinRing />
-      <PearlCore />
+      {/* Pearl core suppressed when the rig is used as ambient backdrop
+          behind another focal element (e.g., the SH monogram). */}
+      {!orbitalOnly && <PearlCore />}
       <Satellite radius={2.05} speed={0.45} phase={0} size={0.10} color="#d4b888" />
       <Satellite radius={2.05} speed={0.45} phase={(Math.PI * 2) / 3} size={0.08} color="#c9a96e" />
       <Satellite radius={2.55} speed={0.32} phase={Math.PI / 2} size={0.06} color="#e0c79a" tilt={0.6} emissive="#3a2a14" />
@@ -212,7 +214,15 @@ function OrbitalRig() {
 }
 
 /* ─── WebGL gate + 2D fallback ──────────────────────────────── */
-export default function HeroOrbital({ size = 380 }: { size?: number }) {
+export default function HeroOrbital({
+  size = 380,
+  orbitalOnly = false,
+}: {
+  size?: number;
+  /** When true, skips rendering the pearl core (the rig becomes an
+      ambient backdrop — rings, satellites, particles only). */
+  orbitalOnly?: boolean;
+}) {
   const [canRender, setCanRender] = useState(false);
 
   useEffect(() => {
@@ -271,7 +281,7 @@ export default function HeroOrbital({ size = 380 }: { size?: number }) {
         <directionalLight position={[3, 4, 3]} intensity={1.0} color="#fff8f0" />
         <directionalLight position={[-1, -2, -1]} intensity={0.3} color="#c8d8e8" />
 
-        <OrbitalRig />
+        <OrbitalRig orbitalOnly={orbitalOnly} />
       </Canvas>
     </span>
   );

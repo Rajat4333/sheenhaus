@@ -2,10 +2,12 @@ import type { Metadata } from "next";
 import { Instrument_Serif, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import PageVeil from "@/components/PageVeil";
+import PageTransition from "@/components/PageTransition";
+import FirstVisit from "@/components/FirstVisit";
+import ConsoleSignature from "@/components/ConsoleSignature";
 import AfterHours from "@/components/AfterHours";
 import AmbientAudio from "@/components/AmbientAudio";
 import FaviconSwitcher from "@/components/FaviconSwitcher";
-import MagneticCursor from "@/components/MagneticCursor";
 import { Analytics } from "@vercel/analytics/next";
 
 // Self-host fonts via Next.js — eliminates render-blocking external CSS,
@@ -68,8 +70,10 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://images.unsplash.com" />
       </head>
       <body className="overflow-x-hidden">
-        <MagneticCursor />
         <PageVeil />
+        <PageTransition />
+        <FirstVisit />
+        <ConsoleSignature />
         <AfterHours />
         <AmbientAudio />
         <FaviconSwitcher />

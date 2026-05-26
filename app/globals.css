@@ -123,16 +123,7 @@ html[data-hours="after"] .theme-clinical {
   --cl-bg: #fdfbf6;
 }
 
-/* Custom cursor — hide native on fine-pointer (mouse) devices.
-   MagneticCursor renders the replacement dot + ring in JS.
-   Coarse-pointer (touch) keeps the default browser cursor. */
-@media (pointer: fine) {
-  *, *::before, *::after { cursor: none !important; }
-}
-/* Restore default cursor on touch / coarse pointers */
-@media (hover: none), (pointer: coarse) {
-  body { cursor: auto; }
-}
+/* Native cursor restored — MagneticCursor disabled. */
 
 /* Serif defaults — Instrument Serif only ships as 400 regular + 400 italic.
    Forcing weight 400 prevents the browser from synthesizing bold on headings,
@@ -576,6 +567,51 @@ a[data-link-style="bronze"]:hover {
 }
 .theme-clinical .cl-halo-anim {
   animation: cl-halo-drift 12s ease-in-out infinite;
+}
+
+/* Pulsing bronze status dot — "studio · open" indicator on the right rail */
+@keyframes cl-status-pulse {
+  0%   { box-shadow: 0 0 0 0   rgba(138,106,53,0.55); }
+  70%  { box-shadow: 0 0 0 9px rgba(138,106,53,0);    }
+  100% { box-shadow: 0 0 0 0   rgba(138,106,53,0);    }
+}
+
+/* Continuous activity-ticker marquee — moves the full duplicated track
+   leftward by one-third (one full set), which equals the loop boundary
+   because the track contains three copies. */
+@keyframes cl-ticker {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-33.3333%); }
+}
+
+/* Cinematic hero — floating gold dust slow drift */
+@keyframes cl-dust-drift {
+  0%, 100% {
+    transform: translate3d(0, 0, 0);
+    opacity: var(--dust-opacity, 0.3);
+  }
+  50% {
+    transform: translate3d(8px, -14px, 0);
+    opacity: var(--dust-opacity-peak, 0.55);
+  }
+}
+
+/* Hero — code stream caret (blinking block cursor) */
+@keyframes cl-caret-blink {
+  0%, 49%   { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+/* Cinematic hero — explore indicator vertical pulse line */
+@keyframes cl-explore-pulse {
+  0%, 100% {
+    transform: scaleY(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scaleY(1.35);
+    opacity: 1;
+  }
 }
 
 /* ── Drifting gradient mesh background ─────────────────────

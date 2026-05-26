@@ -10,7 +10,7 @@
 
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment, Lightformer } from "@react-three/drei";
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 
@@ -75,18 +75,24 @@ function NodeMesh({ kind, hovered }: { kind: NodeKind; hovered: boolean }) {
   return (
     <group ref={group}>
       <mesh ref={mesh}>
-        {kind === "audit"    && <icosahedronGeometry args={[0.82, 0]} />}
-        {kind === "build"    && <torusGeometry args={[0.65, 0.26, 24, 72]} />}
-        {kind === "automate" && <sphereGeometry args={[0.72, 64, 64]} />}
-        {/* Matte stone/chalk — premium, not glossy */}
+        {/* Higher-res geometries for smoother silhouettes (esp. the
+            audit icosahedron — detail=1 subdivides each face once,
+            cleaner shading without losing the geometric character). */}
+        {kind === "audit"    && <icosahedronGeometry args={[0.82, 1]} />}
+        {kind === "build"    && <torusGeometry args={[0.65, 0.26, 48, 128]} />}
+        {kind === "automate" && <sphereGeometry args={[0.72, 96, 96]} />}
+        {/* Polished pearl — lower roughness + clearcoat for that
+            "premium matte porcelain" feel without going plastic. */}
         <meshPhysicalMaterial
-          color={kind === "audit" ? "#ccc8c0" : kind === "build" ? "#d8d2c6" : "#e0dbd2"}
-          metalness={0.04}
-          roughness={kind === "audit" ? 0.55 : kind === "build" ? 0.48 : 0.42}
-          sheen={0.18}
-          sheenRoughness={0.6}
-          sheenColor="#b8956a"
-          envMapIntensity={hovered ? 1.0 : 0.6}
+          color={kind === "audit" ? "#dad6cd" : kind === "build" ? "#e2dcd0" : "#e8e3d8"}
+          metalness={0.12}
+          roughness={kind === "audit" ? 0.32 : kind === "build" ? 0.28 : 0.22}
+          clearcoat={0.6}
+          clearcoatRoughness={0.18}
+          sheen={0.3}
+          sheenRoughness={0.5}
+          sheenColor="#c9a96e"
+          envMapIntensity={hovered ? 1.4 : 1.0}
         />
       </mesh>
 
@@ -148,32 +154,61 @@ const PACKETS = [
   { delay: 1.65, size: 4, color: "#b8906a", glow: "rgba(184,144,106,0.4)" },
 ];
 
-function FlowLine({ inView }: { inView: boolean }) {
+function FlowSegment({
+  inView,
+  side,
+  delay,
+}: {
+  inView: boolean;
+  side: "left" | "right";
+  delay: number;
+}) {
+  /* Each segment runs from one outer node's edge to the build node's
+     edge. The Build torus is centred at 50% of the diagram width, and
+     its visible canvas is ~220px wide → keep a 130px gap each side of
+     50% so the line never passes through the donut hole. */
+  const positionClasses =
+    side === "left"
+      ? "left-[calc(16.66%+28px)] right-[calc(50%+130px)]"
+      : "left-[calc(50%+130px)] right-[calc(16.66%+28px)]";
+
+  /* The dashed gradient direction differs per side so the rhythm of
+     dashes always points "toward" Build. */
+  const gradient =
+    side === "left"
+      ? "linear-gradient(90deg, transparent 0%, rgba(26,22,18,0.16) 10%, rgba(26,22,18,0.16) 90%, transparent 100%)"
+      : "linear-gradient(90deg, transparent 0%, rgba(26,22,18,0.16) 10%, rgba(26,22,18,0.16) 90%, transparent 100%)";
+
   return (
-    <div className="hidden md:block absolute top-[108px] left-[calc(16.66%+28px)] right-[calc(16.66%+28px)] pointer-events-none">
-      {/* Base hairline */}
+    <div
+      className={`hidden md:block absolute top-[108px] ${positionClasses} pointer-events-none`}
+    >
       <motion.div
         className="absolute inset-0 top-1/2 -translate-y-1/2"
         style={{
           height: 1,
-          background: "linear-gradient(90deg, transparent 0%, rgba(26,22,18,0.12) 10%, rgba(26,22,18,0.12) 90%, transparent 100%)",
+          background: gradient,
+          originX: side === "left" ? 0 : 1,
         }}
         initial={{ scaleX: 0, opacity: 0 }}
         animate={inView ? { scaleX: 1, opacity: 1 } : {}}
-        transition={{ duration: 1.2, delay: 0.4, ease: [0.2, 0.7, 0.2, 1] }}
+        transition={{
+          duration: 1.0,
+          delay,
+          ease: [0.2, 0.7, 0.2, 1],
+        }}
       />
-      {/* Dashed overlay — visual rhythm */}
       <motion.div
         className="absolute inset-0 top-1/2 -translate-y-1/2"
         style={{
           height: 1,
-          backgroundImage: "repeating-linear-gradient(90deg, rgba(138,106,53,0.22) 0px, rgba(138,106,53,0.22) 12px, transparent 12px, transparent 24px)",
+          backgroundImage:
+            "repeating-linear-gradient(90deg, rgba(138,106,53,0.26) 0px, rgba(138,106,53,0.26) 12px, transparent 12px, transparent 24px)",
         }}
         initial={{ opacity: 0 }}
         animate={inView ? { opacity: 1 } : {}}
-        transition={{ duration: 0.8, delay: 1.0 }}
+        transition={{ duration: 0.8, delay: delay + 0.5 }}
       />
-      {/* Data packets */}
       {inView && PACKETS.map((p, i) => (
         <motion.div
           key={i}
@@ -200,6 +235,16 @@ function FlowLine({ inView }: { inView: boolean }) {
         />
       ))}
     </div>
+  );
+}
+
+/* Wrapper — renders both flow segments around the Build node. */
+function FlowLine({ inView }: { inView: boolean }) {
+  return (
+    <>
+      <FlowSegment inView={inView} side="left"  delay={0.4} />
+      <FlowSegment inView={inView} side="right" delay={0.55} />
+    </>
   );
 }
 
@@ -236,20 +281,28 @@ function hasWebGL(): boolean {
 /* ─── Main section ──────────────────────────────────────────── */
 export default function ProcessDiagram() {
   const ref = useRef<HTMLElement>(null);
-  const inView = useInView(ref, { once: true, amount: 0.25 });
   const [canRender3D, setCanRender3D] = useState(false);
   const [hovered, setHovered] = useState<NodeKind | null>(null);
-  // If the section is already visible on mount (scroll restoration), skip entrance animation
-  const [skipEntrance, setSkipEntrance] = useState(false);
+  /* Fire the build animation once shortly after mount — independent
+     of scroll position. By the time the user scrolls down to this
+     section, the elements are already settled. Set `skipEntrance`
+     true only on a hard scroll-restoration that lands ALREADY past
+     this section (rare). */
+  const [inView, setInView] = useState(false);
+  const [skipEntrance] = useState(false);
 
   useEffect(() => {
-    const reduced = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    const reduced =
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     setCanRender3D(hasWebGL() && !reduced);
-    // Check if element is already in viewport on mount
-    if (ref.current) {
-      const rect = ref.current.getBoundingClientRect();
-      if (rect.top < window.innerHeight * 0.9) setSkipEntrance(true);
-    }
+
+    /* Trigger entrance on mount, after a tiny stabilising delay so the
+       3D canvases have a chance to allocate their contexts on the GPU
+       before we kick off the transform animations on the same frame.
+       Result: no jank, smooth build. */
+    const t = window.setTimeout(() => setInView(true), 220);
+    return () => window.clearTimeout(t);
   }, []);
 
   return (
@@ -258,20 +311,20 @@ export default function ProcessDiagram() {
       className="theme-clinical relative overflow-hidden"
       style={{ background: "var(--cl-bg)" }}
     >
-      <div className="relative z-10 max-w-[1200px] mx-auto px-6 py-32 md:py-44">
+      <div className="relative z-10 max-w-[1200px] mx-auto px-6 py-16 md:py-24">
 
-        {/* Eyebrow */}
+        {/* Eyebrow — comes from above (off-screen top) */}
         <motion.div
           className="text-[10px] uppercase tracking-[0.32em] mb-6 text-center"
           style={{ color: "var(--cl-ink-faint)" }}
-          initial={skipEntrance ? false : { opacity: 0 }}
-          animate={inView ? { opacity: 1 } : {}}
-          transition={{ duration: 0.8 }}
+          initial={skipEntrance ? false : { opacity: 0, y: -28 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.9, ease: [0.2, 0.7, 0.2, 1] }}
         >
           <span style={{ color: "#8a6a35" }}>●</span> How we work
         </motion.div>
 
-        {/* Heading */}
+        {/* Heading — rises from below */}
         <motion.h2
           className="cl-display text-center mx-auto"
           style={{
@@ -281,19 +334,20 @@ export default function ProcessDiagram() {
             letterSpacing: "-0.025em",
             maxWidth: "22ch",
           }}
-          initial={skipEntrance ? false : { opacity: 0, y: 14 }}
+          initial={skipEntrance ? false : { opacity: 0, y: 40 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.9, delay: 0.1, ease: [0.2, 0.7, 0.2, 1] }}
+          transition={{ duration: 1.0, delay: 0.15, ease: [0.2, 0.7, 0.2, 1] }}
         >
           Three steps. <em>End to end.</em>
         </motion.h2>
 
+        {/* Subhead — rises from below, deeper offset */}
         <motion.p
           className="mt-6 text-[15px] max-w-lg mx-auto text-center"
           style={{ color: "var(--cl-ink-soft)" }}
-          initial={skipEntrance ? false : { opacity: 0, y: 10 }}
+          initial={skipEntrance ? false : { opacity: 0, y: 30 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.2, ease: [0.2, 0.7, 0.2, 1] }}
+          transition={{ duration: 0.9, delay: 0.3, ease: [0.2, 0.7, 0.2, 1] }}
         >
           We measure what&rsquo;s broken, rebuild the surface, then automate
           everything that happens behind it. One small team, three deliverables.
@@ -304,12 +358,21 @@ export default function ProcessDiagram() {
           <FlowLine inView={inView} />
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 relative">
-            {NODES.map((n, i) => (
+            {NODES.map((n, i) => {
+              /* Each node arrives from a different edge:
+                 - Audit (left node)   → slides in from the left
+                 - Build (center node) → rises from below
+                 - Automate (right)    → slides in from the right
+                 Creates the "elements coming from screen edges" feel as
+                 the hero flips out above. */
+              const xOffset = i === 0 ? -120 : i === 2 ? 120 : 0;
+              const yOffset = i === 1 ? 80 : 30;
+              return (
               <motion.div
                 key={n.kind}
-                initial={skipEntrance ? false : { opacity: 0, scale: 0.65, rotateY: -30 }}
-                animate={inView ? { opacity: 1, scale: 1, rotateY: 0 } : {}}
-                transition={{ duration: 1.0, delay: skipEntrance ? 0 : 0.4 + i * 0.22, ease: [0.2, 0.7, 0.2, 1] }}
+                initial={skipEntrance ? false : { opacity: 0, x: xOffset, y: yOffset, scale: 0.85 }}
+                animate={inView ? { opacity: 1, x: 0, y: 0, scale: 1 } : {}}
+                transition={{ duration: 1.05, delay: skipEntrance ? 0 : 0.5 + i * 0.18, ease: [0.2, 0.7, 0.2, 1] }}
                 whileHover={{ y: -10 }}
                 className="flex flex-col items-center text-center cursor-default"
                 style={{ perspective: 800 }}
@@ -359,7 +422,8 @@ export default function ProcessDiagram() {
                   {n.body}
                 </p>
               </motion.div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>

@@ -1,21 +1,34 @@
 "use client";
 
-/* Hero — taut single-screen pitch.
-   Orb + headline + CTAs + stats, all visible without scrolling.
-   No sticky scrub, no 300vh wrapper — scroll lands straight into
-   ProcessDiagram which carries the storytelling. */
+/* SignatureHero — taut single-screen light-theme hero.
+ *
+ * Cream/clinical theme. No 3D, no monogram, no side rails. A clean
+ * editorial composition: floating pill nav at top, positioning tags,
+ * the headline, subhead, CTAs, and the studio-stats row. Everything
+ * visible without scrolling.
+ *
+ * Acts as the placeholder while the "elegant luxury" direction is
+ * decided. */
 
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { useRef, useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
+  AnimatePresence,
   motion,
+  useReducedMotion,
+  useScroll,
   useTransform,
-  useSpring,
-  useMotionValue,
 } from "framer-motion";
 
-/* Nav sphere — 14 px dot. 2D gradient until three.js hydrates. */
+/* Drafting grid — bronze hairline grid with CAD-style cursor crosshair
+   + nearest-intersection marker + coordinate readout + slow random cell
+   illumination. Canvas-based, client-only. */
+const DraftingGrid = dynamic(
+  () => import("@/components/DraftingGrid"),
+  { ssr: false }
+);
+
 const WordmarkSphere = dynamic(() => import("@/components/WordmarkSphere"), {
   ssr: false,
   loading: () => (
@@ -24,24 +37,6 @@ const WordmarkSphere = dynamic(() => import("@/components/WordmarkSphere"), {
       style={{
         background:
           "linear-gradient(135deg, #1a1a1a 0%, #4a4a4a 60%, #c9b89e 100%)",
-      }}
-      aria-hidden="true"
-    />
-  ),
-});
-
-/* Hero orbital — layered 3D rig (pearl core + gold ring + satellites + particles). */
-const HeroOrbital = dynamic(() => import("@/components/HeroOrbital"), {
-  ssr: false,
-  loading: () => (
-    <span
-      className="block rounded-full"
-      style={{
-        width: 380,
-        height: 380,
-        background:
-          "radial-gradient(circle at 35% 32%, #ede0c8 0%, #c9b89e 40%, #8a6a35 72%, #3a2a18 100%)",
-        opacity: 0.45,
       }}
       aria-hidden="true"
     />
@@ -58,50 +53,50 @@ const NAV = [
 ];
 
 export default function SignatureHero() {
-  const sectionRef = useRef<HTMLElement>(null);
+  /* Scroll-driven fly-out — no sticky wrapper. The section is a plain
+     100vh. As the user scrolls, the section naturally scrolls up off
+     the page AND its content tips/flies away at the same time. By the
+     time the hero has fully left the viewport (100vh of scroll), the
+     fly-out is complete and ProcessDiagram has fully arrived in its
+     place. One continuous motion. */
+  const ref = useRef<HTMLElement>(null);
+  const reducedMotion = useReducedMotion();
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    /* progress = 0 when section top = viewport top (you're on the hero)
+       progress = 1 when section bottom = viewport top (hero just left) */
+    offset: ["start start", "end start"],
+  });
 
-  /* ── Mouse parallax for sphere tilt ─────────────────────── */
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  const sphereTiltX = useSpring(useTransform(mouseY, [-400, 400], [8, -8]), { stiffness: 50, damping: 18 });
-  const sphereTiltY = useSpring(useTransform(mouseX, [-600, 600], [-8, 8]), { stiffness: 50, damping: 18 });
-
-  useEffect(() => {
-    const onMove = (e: MouseEvent) => {
-      mouseX.set(e.clientX - window.innerWidth / 2);
-      mouseY.set(e.clientY - window.innerHeight / 2);
-    };
-    window.addEventListener("mousemove", onMove, { passive: true });
-    return () => window.removeEventListener("mousemove", onMove);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  /* ── Stats counter — fires on mount once entrance settles ── */
-  const [statsActive, setStatsActive] = useState(false);
-  useEffect(() => {
-    const t = setTimeout(() => setStatsActive(true), 1100);
-    return () => clearTimeout(t);
-  }, []);
+  /* "Fly out" — text rushes toward the camera, blurs, and fades. */
+  const scale      = useTransform(scrollYProgress, [0, 0.85], [1, 1.55]);
+  const translateZ = useTransform(scrollYProgress, [0, 0.85], [0, 420]);
+  const translateY = useTransform(scrollYProgress, [0, 0.85], [0, -110]);
+  /* Stay solid through the first half, collapse opacity by 70% so the
+     content is fully gone well before the section exits. */
+  const opacity    = useTransform(scrollYProgress, [0, 0.35, 0.65, 0.8], [1, 1, 0.15, 0]);
+  /* Motion blur ramps only in the back half — keeps the type readable. */
+  const filter     = useTransform(scrollYProgress, [0, 0.3, 0.8], ["blur(0px)", "blur(0px)", "blur(10px)"]);
 
   return (
     <section
-      ref={sectionRef}
+      ref={ref}
       className="theme-clinical relative overflow-hidden"
-      style={{ minHeight: "100vh", background: "var(--cl-bg)" }}
+      style={{
+        background: "var(--cl-bg)",
+        minHeight: "100vh",
+        height: "100vh",
+        /* Perspective lives on the section so the rotated content
+           reads as 3D depth. */
+        perspective: 1600,
+        perspectiveOrigin: "50% 35%",
+      }}
     >
-      {/* Ambient drifting mesh blobs */}
-      <div className="cl-mesh absolute inset-0" aria-hidden>
-        <span />
-      </div>
+      {/* Drafting grid — bronze hairlines + CAD crosshair behind content.
+          STAYS ANCHORED — never rotates. */}
+      <DraftingGrid />
 
-      {/* Slow iridescent conic shimmer */}
-      <div
-        className="sheen-conic absolute inset-0 pointer-events-none"
-        style={{ opacity: 0.45 }}
-        aria-hidden
-      />
-
-      {/* ── Floating pill nav ──────────────────────────────── */}
+      {/* Floating pill nav — stays anchored above the content stack. */}
       <nav className="absolute top-6 left-1/2 -translate-x-1/2 z-50 px-4">
         <motion.div
           initial={{ opacity: 0, y: -14 }}
@@ -115,21 +110,25 @@ export default function SignatureHero() {
         >
           <Link
             href="/"
-            data-magnetic
             className="inline-flex items-center gap-2 pl-3 pr-3 py-1.5"
           >
             <WordmarkSphere size={14} />
-            <span className="text-sm tracking-tight" style={{ color: "var(--cl-ink)" }}>
+            <span
+              className="text-sm tracking-tight"
+              style={{ color: "var(--cl-ink)" }}
+            >
               sheenhaus
             </span>
           </Link>
-          <span className="w-px h-4 mx-1" style={{ background: "var(--cl-stroke)" }} />
+          <span
+            className="w-px h-4 mx-1"
+            style={{ background: "var(--cl-stroke)" }}
+          />
           <div className="hidden md:flex items-center gap-0.5">
             {NAV.map((n) => (
               <Link
                 key={n.href}
                 href={n.href}
-                data-magnetic
                 className="px-3 py-1.5 text-[11px] tracking-[0.16em] uppercase rounded-full transition-colors duration-300 hover:bg-black/[0.03]"
                 style={{ color: "var(--cl-ink-soft)" }}
               >
@@ -141,78 +140,46 @@ export default function SignatureHero() {
             href={CAL_LINK}
             target="_blank"
             rel="noopener noreferrer"
-            data-magnetic
             className="ml-1 px-4 py-1.5 text-xs rounded-full transition-opacity hover:opacity-85"
-            style={{ background: "var(--cl-pill-bg)", color: "var(--cl-pill-ink)" }}
+            style={{
+              background: "var(--cl-pill-bg)",
+              color: "var(--cl-pill-ink)",
+            }}
           >
             Book a call
           </a>
         </motion.div>
       </nav>
 
-      {/* ── Main content column ────────────────────────────── */}
-      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 pt-28 pb-16 text-center gap-0">
-
-        {/* Hero orb — atmospheric halo + parallax tilt */}
-        <div className="mb-6 md:mb-8 relative flex items-center justify-center">
-          {/* Soft atmospheric halo — bleeds beyond the canvas */}
-          <div
-            aria-hidden
-            className="absolute pointer-events-none"
-            style={{
-              width: 560,
-              height: 560,
-              borderRadius: "50%",
-              background:
-                "radial-gradient(circle, rgba(220,200,160,0.32) 0%, rgba(210,195,170,0.12) 40%, transparent 72%)",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              animation: "cl-halo-drift 10s ease-in-out infinite",
-            }}
-          />
-          {/* Second outer glow ring */}
-          <div
-            aria-hidden
-            className="absolute pointer-events-none"
-            style={{
-              width: 760,
-              height: 760,
-              borderRadius: "50%",
-              background:
-                "radial-gradient(circle, rgba(200,215,230,0.10) 0%, transparent 65%)",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-            }}
-          />
-          {/* SH monogram — the hero centerpiece. Mouse parallax tilt +
-              gentle drift float. No orbital rig competing for attention;
-              the brand mark stands alone. */}
-          <MonogramMark
-            rotateX={sphereTiltX}
-            rotateY={sphereTiltY}
-          />
-        </div>
-
-        {/* Tag pills */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.45, ease: [0.2, 0.7, 0.2, 1] }}
-          className="inline-flex flex-wrap items-center justify-center gap-2 mb-8"
-        >
-          <Tag glyph="▲" label="Considered" />
-          <Tag glyph="✦" label="Automated" />
-          <Tag glyph="◐" label="AI-native" />
-        </motion.div>
+      {/* Main content — code stream, headline, subhead, CTAs. This is
+          the layer that flips. Everything outside it (grid, nav, cream
+          background) stays anchored. */}
+      <motion.div
+        className="relative z-10 h-full flex flex-col items-center justify-center px-6 pt-28 pb-16 text-center gap-0"
+        style={
+          reducedMotion
+            ? undefined
+            : {
+                scale,
+                translateZ,
+                y: translateY,
+                opacity,
+                filter,
+                transformOrigin: "center center",
+                transformStyle: "preserve-3d",
+                willChange: "transform, opacity, filter",
+              }
+        }
+      >
+        {/* Live code stream — cycles through short snippets above the H1 */}
+        <CodeStream />
 
         {/* Headline */}
         <motion.h1
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: 0.55, ease: [0.2, 0.7, 0.2, 1] }}
-          className="cl-display text-[clamp(2.25rem,5.5vw,4.75rem)] leading-[1.05] tracking-[-0.028em]"
+          transition={{ duration: 1.0, delay: 0.55, ease: [0.2, 0.7, 0.2, 1] }}
+          className="cl-display text-[clamp(2.5rem,6.5vw,5.5rem)] leading-[1.05] tracking-[-0.028em]"
           style={{ color: "var(--cl-ink)" }}
         >
           <span className="block">End-to-end tech for businesses</span>
@@ -225,8 +192,8 @@ export default function SignatureHero() {
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.85, delay: 0.72, ease: [0.2, 0.7, 0.2, 1] }}
-          className="flex flex-col items-center gap-7 mt-7"
+          transition={{ duration: 0.95, delay: 0.85, ease: [0.2, 0.7, 0.2, 1] }}
+          className="flex flex-col items-center gap-8 mt-10 md:mt-12"
         >
           <p
             className="text-[15px] md:text-base max-w-xl"
@@ -236,166 +203,254 @@ export default function SignatureHero() {
             surface. Hand-coded for businesses that refuse to look like everyone else.
           </p>
           <div className="flex flex-col sm:flex-row items-center gap-4">
-            <Link href="/audit" data-magnetic className="cta-primary">
+            <Link href="/audit" className="cta-primary">
               Audit your site <span aria-hidden>→</span>
             </Link>
-            <Link
-              href="/state-of-premium/jewellery"
-              data-magnetic
-              className="cta-ghost"
-            >
+            <Link href="/state-of-premium/jewellery" className="cta-ghost">
               Read the field report <span aria-hidden>→</span>
             </Link>
           </div>
         </motion.div>
 
-        {/* Stats row */}
+        {/* Tiny editorial credit at the bottom of the section — a hallmark. */}
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.95, ease: [0.2, 0.7, 0.2, 1] }}
-          className="mt-14 md:mt-16 max-w-[920px] w-full"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.7 }}
+          transition={{ duration: 1.0, delay: 1.4 }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 text-[10px] tracking-[0.32em] uppercase pointer-events-none"
+          style={{
+            color: "var(--cl-ink-faint)",
+            fontFamily: "var(--font-ibm-plex-mono), monospace",
+          }}
+          aria-hidden
         >
-          <div
-            className="text-[10px] uppercase tracking-[0.28em] mb-7 text-center"
-            style={{ color: "var(--cl-ink-faint)" }}
-          >
-            <span style={{ color: "#8a6a35" }}>●</span> The studio
-          </div>
-          <div className="grid grid-cols-3 gap-4 md:gap-12">
-            <Trophy value={3}   suffix=""      label="Engagements at a time" delay={0}   active={statsActive} />
-            <Trophy value={14}  suffix=" days" label="From brief to launch"  delay={0.2} active={statsActive} />
-            <Trophy value={100} suffix="%"     label="Hand-coded"            delay={0.4} active={statsActive} />
-          </div>
+          Sheenhaus · Studio · Delhi · MMXXVI
         </motion.div>
-      </div>
+      </motion.div>
     </section>
   );
 }
 
-/* ── Tag pill ────────────────────────────────────────────────── */
-function Tag({ glyph, label }: { glyph: string; label: string }) {
-  return (
-    <span
-      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] tracking-[0.18em] uppercase"
-      style={{
-        background: "var(--cl-tag-bg)",
-        color: "var(--cl-ink-soft)",
-        border: "1px solid var(--cl-stroke)",
-      }}
-    >
-      <span style={{ color: "var(--cl-ink)", opacity: 0.6 }}>{glyph}</span>
-      <span>{label}</span>
-    </span>
-  );
-}
 
-/* ── Shimmer word ────────────────────────────────────────────── */
 function ShimmerWord({ word }: { word: string }) {
   return <span className="shimmer-word">{word}</span>;
 }
 
-/* ── Trophy — animated counter ───────────────────────────────── */
-function Trophy({
-  value, suffix, label, delay, active,
-}: {
-  value: number;
-  suffix: string;
+/* ── CodeStream — a small mono "live terminal" above the headline.
+ *
+ * Cycles through short, plausible code/CLI snippets that represent
+ * each phase of the studio's work (audit, build, agent, shader). Each
+ * snippet holds for ~4.5s then crossfades to the next via
+ * AnimatePresence. Coloured by hand — keywords bronze, comments dim,
+ * results in the soft-ink tone.
+ *
+ * Fixed minHeight so the layout doesn't shift as snippets change. A
+ * blinking bronze caret sits at the end of the last line.
+ *
+ * Tech signal without redundancy — nothing else on the page shows
+ * code blocks. */
+
+interface Snippet {
   label: string;
-  delay: number;
-  active: boolean;
-}) {
-  const [n, setN] = useState(0);
-
-  useEffect(() => {
-    if (!active) return;
-    let raf = 0;
-    const start = performance.now() + delay * 1000;
-    const dur = 1400;
-    const tick = (t: number) => {
-      if (t < start) { raf = requestAnimationFrame(tick); return; }
-      const p = Math.min(1, (t - start) / dur);
-      const eased = 1 - Math.pow(1 - p, 3);
-      setN(Math.round(value * eased));
-      if (p < 1) raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [value, delay, active]);
-
-  return (
-    <div className="text-center">
-      <div
-        className="cl-display tabular-nums leading-none"
-        style={{
-          fontSize: "clamp(2.5rem, 5.5vw, 4.5rem)",
-          color: "var(--cl-ink)",
-          letterSpacing: "-0.035em",
-        }}
-      >
-        {n}
-        <span
-          className="text-base md:text-lg"
-          style={{ color: "var(--cl-ink-faint)", letterSpacing: "-0.02em" }}
-        >
-          {suffix}
-        </span>
-      </div>
-      <div
-        className="mt-3 text-[10px] uppercase tracking-[0.22em]"
-        style={{
-          color: "var(--cl-ink-faint)",
-          fontFamily: "var(--font-ibm-plex-mono), monospace",
-        }}
-      >
-        {label}
-      </div>
-    </div>
-  );
+  lines: Array<Array<{ text: string; tone?: "key" | "dim" | "num" | "str" | "result" }>>;
 }
 
-/* ── SH monogram — the brand mark, layered over the orbital rig
-   Loads /public/sheenhaus-monogram.png. If missing, the component
-   hides itself silently. Transparent PNGs render directly; white-
-   background PNGs are cleaned up by mix-blend-mode: multiply
-   against the cream theme. */
-function MonogramMark({
-  rotateX,
-  rotateY,
-}: {
-  rotateX: import("framer-motion").MotionValue<number>;
-  rotateY: import("framer-motion").MotionValue<number>;
-}) {
-  const [missing, setMissing] = useState(false);
-  if (missing) return null;
+const SNIPPETS: Snippet[] = [
+  {
+    label: "sheen/audit · live",
+    lines: [
+      [
+        { text: "$ ", tone: "dim" },
+        { text: "sheen audit ", tone: "key" },
+        { text: "tanishq.com", tone: "str" },
+      ],
+      [
+        { text: "→ craft ", tone: "result" },
+        { text: "24", tone: "num" },
+        { text: " · ai ", tone: "result" },
+        { text: "12", tone: "num" },
+        { text: " · trust ", tone: "result" },
+        { text: "38", tone: "num" },
+      ],
+    ],
+  },
+  {
+    label: "sheen/build · cinematic",
+    lines: [
+      [
+        { text: "const ", tone: "key" },
+        { text: "hero = ", tone: "result" },
+        { text: "render", tone: "key" },
+        { text: "(<Signature />)" },
+      ],
+      [
+        { text: "// ", tone: "dim" },
+        { text: "lighthouse ", tone: "dim" },
+        { text: "96", tone: "num" },
+        { text: " · paint ", tone: "dim" },
+        { text: "0.42s", tone: "num" },
+      ],
+    ],
+  },
+  {
+    label: "sheen/agent · running",
+    lines: [
+      [
+        { text: "on", tone: "key" },
+        { text: "(", tone: "result" },
+        { text: "'lead.new'", tone: "str" },
+        { text: ", ", tone: "result" },
+        { text: "route", tone: "key" },
+        { text: ")", tone: "result" },
+      ],
+      [
+        { text: "// ", tone: "dim" },
+        { text: "47", tone: "num" },
+        { text: " workflows · ", tone: "dim" },
+        { text: "0", tone: "num" },
+        { text: " misroutes", tone: "dim" },
+      ],
+    ],
+  },
+  {
+    label: "sheen/material · gpu",
+    lines: [
+      [
+        { text: "vec3 ", tone: "key" },
+        { text: "sheen = ", tone: "result" },
+        { text: "mix", tone: "key" },
+        { text: "(bronze, cream, n)", tone: "result" },
+      ],
+      [
+        { text: "// ", tone: "dim" },
+        { text: "shader ", tone: "dim" },
+        { text: "0.6ms", tone: "num" },
+        { text: " · GPU resident", tone: "dim" },
+      ],
+    ],
+  },
+  {
+    label: "sheen/deploy · ok",
+    lines: [
+      [
+        { text: "$ ", tone: "dim" },
+        { text: "git push ", tone: "key" },
+        { text: "production", tone: "str" },
+      ],
+      [
+        { text: "→ ", tone: "result" },
+        { text: "12", tone: "num" },
+        { text: " routes · ", tone: "result" },
+        { text: "edge", tone: "key" },
+        { text: " · live in ", tone: "result" },
+        { text: "23s", tone: "num" },
+      ],
+    ],
+  },
+];
+
+const TONE_COLOR: Record<NonNullable<Snippet["lines"][number][number]["tone"]> | "default", string> = {
+  default: "var(--cl-ink-soft)",
+  key: "#8a6a35",
+  dim: "rgba(138,125,104,0.65)",
+  num: "#75582b",
+  str: "rgba(60,40,16,0.85)",
+  result: "rgba(74,66,51,0.85)",
+};
+
+function CodeStream() {
+  const [idx, setIdx] = useState(0);
+
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      setIdx((i) => (i + 1) % SNIPPETS.length);
+    }, 4600);
+    return () => window.clearInterval(id);
+  }, []);
+
+  const snip = SNIPPETS[idx];
+
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.86, y: 8 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
-      transition={{ duration: 1.3, delay: 0.2, ease: [0.2, 0.7, 0.2, 1] }}
-      className="pointer-events-none relative"
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.9, delay: 0.35, ease: [0.2, 0.7, 0.2, 1] }}
+      className="w-full max-w-xl mb-9 md:mb-11 text-left"
+      aria-hidden
       style={{
-        rotateX,
-        rotateY,
-        transformStyle: "preserve-3d",
-        zIndex: 1,
-        // Gentle ambient drift — feels alive, never distracting
-        animation: "cl-halo-drift 9s ease-in-out infinite",
+        fontFamily: "var(--font-ibm-plex-mono), monospace",
+        fontSize: 11.5,
+        lineHeight: 1.65,
       }}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/sheenhaus-monogram.png"
-        alt="Sheenhaus"
-        onError={() => setMissing(true)}
-        style={{
-          width: 360,
-          maxWidth: "none", // override Tailwind's img max-width:100%
-          height: "auto",
-          display: "block",
-          mixBlendMode: "multiply",
-        }}
-      />
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={idx}
+          initial={{ opacity: 0, y: 4, filter: "blur(2px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          exit={{ opacity: 0, y: -3, filter: "blur(2px)" }}
+          transition={{ duration: 0.5, ease: [0.2, 0.7, 0.2, 1] }}
+          /* Fixed minHeight stops layout shift across snippet changes */
+          style={{ minHeight: 70 }}
+        >
+          {/* Label header — `// sheen/path · status` */}
+          <div
+            style={{
+              fontSize: 9.5,
+              letterSpacing: "0.22em",
+              textTransform: "uppercase",
+              color: "rgba(138,125,104,0.75)",
+              marginBottom: 8,
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+            }}
+          >
+            <span
+              style={{
+                display: "inline-block",
+                width: 6,
+                height: 6,
+                borderRadius: "50%",
+                background: "#8a6a35",
+                boxShadow: "0 0 0 0 rgba(138,106,53,0.55)",
+                animation: "cl-status-pulse 2.2s ease-out infinite",
+              }}
+            />
+            <span>// {snip.label}</span>
+          </div>
+          {/* Code body */}
+          {snip.lines.map((line, lineIdx) => {
+            const isLast = lineIdx === snip.lines.length - 1;
+            return (
+              <div key={lineIdx} style={{ whiteSpace: "pre" }}>
+                {line.map((tok, ti) => (
+                  <span
+                    key={ti}
+                    style={{ color: TONE_COLOR[tok.tone || "default"] }}
+                  >
+                    {tok.text}
+                  </span>
+                ))}
+                {/* Blinking caret at end of last line */}
+                {isLast && (
+                  <span
+                    style={{
+                      display: "inline-block",
+                      width: 7,
+                      height: 13,
+                      marginLeft: 4,
+                      verticalAlign: "-2px",
+                      background: "#8a6a35",
+                      animation: "cl-caret-blink 1s steps(2) infinite",
+                    }}
+                  />
+                )}
+              </div>
+            );
+          })}
+        </motion.div>
+      </AnimatePresence>
     </motion.div>
   );
 }
