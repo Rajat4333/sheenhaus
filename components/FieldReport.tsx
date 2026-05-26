@@ -121,11 +121,12 @@ export default function FieldReport() {
               className="mt-8 text-[15px] leading-[1.85] max-w-md"
               style={{ color: "var(--cl-ink-soft)" }}
             >
-              We ran the Sheenhaus Audit against every publicly-listed Indian
-              jewellery company — seven houses, from Tanishq down to P. N.
-              Gadgil. The country&rsquo;s largest house refuses to be audited
-              at all. The same pattern shows up across the businesses we audit
-              elsewhere — clinics, agencies, restaurants, D2C brands.
+              We ran our public audit against every publicly-listed Indian
+              jewellery company — seven houses, referred to in the report
+              by market-cap rank only. One house returned HTTP 403 to our
+              automated request and could not be measured. The same
+              pattern shows up across the businesses we audit elsewhere —
+              clinics, agencies, restaurants, D2C brands.
             </p>
           </div>
 

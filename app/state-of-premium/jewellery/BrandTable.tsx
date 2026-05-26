@@ -1,25 +1,34 @@
 "use client";
 
-// Sortable per-brand table. The visitor can sort by score, market
-// cap, or quarterly sales — the audit score sits next to the
-// financial scale so the gap between offline-brand-size and
-// digital-craft is visible on a single row.
+/* Anonymised per-house table. Brand names, tickers and domains are
+   omitted by editorial choice — the report is a study of the category,
+   not of any one company. Houses are labelled by their rank in
+   descending market capitalisation (House 01 = largest). */
 
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { isAudit, isUnreachable, type Row } from "./types";
 
-type SortKey = "score" | "marketCap" | "qtrSales" | "name";
+type SortKey = "score" | "marketCap" | "qtrSales";
 
 export default function BrandTable({ rows }: { rows: Row[] }) {
   const [sortKey, setSortKey] = useState<SortKey>("marketCap");
   const [asc, setAsc] = useState(false);
 
+  /* Canonical market-cap rank — assigned once, used everywhere even
+     if the user sorts by a different column. */
+  const rankByDomain = useMemo(() => {
+    const byMcap = [...rows].sort(
+      (a, b) => b.brand.marketCapCr - a.brand.marketCapCr
+    );
+    return new Map(byMcap.map((r, i) => [r.brand.domain, i + 1]));
+  }, [rows]);
+
   const sorted = useMemo(() => {
     const copy = [...rows];
     copy.sort((a, b) => {
-      let av: number | string = 0;
-      let bv: number | string = 0;
+      let av = 0;
+      let bv = 0;
       switch (sortKey) {
         case "score":
           av = isAudit(a.audit) ? a.audit.score : -1;
@@ -33,15 +42,8 @@ export default function BrandTable({ rows }: { rows: Row[] }) {
           av = a.brand.qtrSalesCr;
           bv = b.brand.qtrSalesCr;
           break;
-        case "name":
-          av = a.brand.displayName;
-          bv = b.brand.displayName;
-          break;
       }
-      if (typeof av === "string" && typeof bv === "string") {
-        return asc ? av.localeCompare(bv) : bv.localeCompare(av);
-      }
-      return asc ? (av as number) - (bv as number) : (bv as number) - (av as number);
+      return asc ? av - bv : bv - av;
     });
     return copy;
   }, [rows, sortKey, asc]);
@@ -50,7 +52,7 @@ export default function BrandTable({ rows }: { rows: Row[] }) {
     if (k === sortKey) setAsc(!asc);
     else {
       setSortKey(k);
-      setAsc(k === "name");
+      setAsc(false);
     }
   };
 
@@ -59,14 +61,15 @@ export default function BrandTable({ rows }: { rows: Row[] }) {
       {/* Sort controls — quiet mono buttons */}
       <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mb-6 font-mono text-[10px] uppercase tracking-[0.22em] text-text-faint">
         <span>Sort by</span>
-        <SortBtn label="House" k="name" current={sortKey} asc={asc} onClick={setSort} />
         <SortBtn label="Audit score" k="score" current={sortKey} asc={asc} onClick={setSort} />
         <SortBtn label="Market cap" k="marketCap" current={sortKey} asc={asc} onClick={setSort} />
         <SortBtn label="Qtr sales" k="qtrSales" current={sortKey} asc={asc} onClick={setSort} />
       </div>
 
       <ul className="divide-y divide-border border-t border-border">
-        {sorted.map((r, i) => (
+        {sorted.map((r, i) => {
+          const rank = rankByDomain.get(r.brand.domain) ?? 0;
+          return (
           <motion.li
             key={r.brand.domain}
             initial={{ opacity: 0, y: 8 }}
@@ -78,21 +81,13 @@ export default function BrandTable({ rows }: { rows: Row[] }) {
             }}
             className="py-6 grid grid-cols-1 md:grid-cols-[1.6fr_0.8fr_0.9fr_1fr] gap-3 md:gap-6 items-baseline"
           >
-            {/* House — name, ticker, domain */}
+            {/* House — anonymised rank label only */}
             <div>
               <div className="font-serif text-lg md:text-xl text-text leading-tight">
-                {r.brand.displayName}
+                House {String(rank).padStart(2, "0")}
               </div>
               <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-text-faint mt-1">
-                {r.brand.ticker} ·{" "}
-                <a
-                  href={`https://${r.brand.domain}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-accent transition-colors"
-                >
-                  {r.brand.domain}
-                </a>
+                By market cap · publicly listed
               </div>
             </div>
 
@@ -140,7 +135,7 @@ export default function BrandTable({ rows }: { rows: Row[] }) {
                 </div>
               ) : isUnreachable(r.audit) ? (
                 <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-accent mt-2">
-                  Refused audit · {r.audit.reason}
+                  Not measured · {r.audit.reason}
                 </div>
               ) : (
                 <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-text-faint mt-2">
@@ -149,7 +144,8 @@ export default function BrandTable({ rows }: { rows: Row[] }) {
               )}
             </div>
           </motion.li>
-        ))}
+          );
+        })}
       </ul>
     </div>
   );

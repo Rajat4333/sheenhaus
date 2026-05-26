@@ -21,7 +21,7 @@ const TYPED_DATASET = dataset as unknown as Dataset;
 export const metadata: Metadata = {
   title: "The Audit · India's listed jewellery houses, 2026 · Sheenhaus",
   description:
-    "We ran the Sheenhaus Audit against every publicly-listed Indian jewellery company. The median score is 42. None of the seven breaks 60. The country's largest house refuses to be audited at all.",
+    "We ran our public audit against the seven publicly-listed Indian jewellery companies. Houses are referred to by their market-cap rank. By our methodology, the median Sheenhaus Score is 42. None of the measurable houses scored above 60. One house returned HTTP 403 to our automated request and could not be measured.",
 };
 
 /* ─── Aggregate helpers ────────────────────────────────────────── */
@@ -108,12 +108,14 @@ export default function JewelleryStatePage() {
           offline brand. Their websites are not part of that work.
         </h1>
         <p className="text-text-mid text-[17px] max-w-2xl mt-10 leading-[1.8]">
-          We ran the Sheenhaus Audit against every publicly-listed Indian
-          jewellery company &mdash; seven houses, from Tanishq down to P. N.
-          Gadgil. The median Sheenhaus Score is{" "}
-          <span className="text-accent">{agg.median}/100</span>. Not one of the
-          seven breaks 60. The country&rsquo;s largest house refuses to be
-          audited at all. What follows is what the data shows.
+          We ran our public audit against every publicly-listed Indian
+          jewellery company &mdash; seven houses, referred to throughout this
+          report by their market-cap rank (House 01 = largest). By our
+          methodology the median Sheenhaus Score is{" "}
+          <span className="text-accent">{agg.median}/100</span>. None of the
+          six measurable houses scored above 60. The largest by market cap
+          returned HTTP 403 to our automated request and could not be scored.
+          What follows is what the data we could collect shows.
         </p>
 
         {/* Constellation — the entire category, in one image. */}
@@ -138,7 +140,7 @@ export default function JewelleryStatePage() {
             <Stat
               label="Median Sheenhaus Score"
               value={<CountUp target={agg.median} />}
-              caption={`Range ${agg.range[0]}–${agg.range[1]} across ${agg.auditable} auditable houses. One house (Tanishq) blocks automated audits entirely.`}
+              caption={`Range ${agg.range[0]}–${agg.range[1]} across ${agg.auditable} measurable houses. The largest by market cap returned HTTP 403 to our automated request and was not scored.`}
             />
             <Stat
               label="Built on template / page-builder stacks"
@@ -254,32 +256,72 @@ export default function JewelleryStatePage() {
           </a>
         </div>
 
-        {/* Methodology — small, restrained, never the focus */}
-        <div className="mt-24 pt-12 border-t border-border max-w-2xl mx-auto text-left">
-          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-text-faint">
-            Methodology
-          </span>
-          <p className="text-text-mid text-[14px] mt-4 leading-[1.85]">
-            We audited the homepage of each company on{" "}
-            {new Date(TYPED_DATASET.generatedAt).toLocaleDateString("en-GB", {
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-            })}{" "}
-            using the same heuristics that power the public{" "}
-            <Link href="/audit" className="text-accent underline-offset-4 hover:underline">
-              /audit
-            </Link>{" "}
-            tool. Financial figures are from Screener.in for the most recent
-            quarter. Scores are computed from twelve weighted detectors
-            outlined in our{" "}
-            <Link href="/signs" className="text-accent underline-offset-4 hover:underline">
-              twelve signs
-            </Link>{" "}
-            diagnostic. One house (Tanishq) returned HTTP 403 to our
-            request &mdash; the same behaviour visitors see when sharing the
-            URL on Slack or WhatsApp.
-          </p>
+        {/* Methodology + legal — small, restrained, never the focus */}
+        <div className="mt-24 pt-12 border-t border-border max-w-2xl mx-auto text-left space-y-6">
+          <div>
+            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-text-faint">
+              Methodology
+            </span>
+            <p className="text-text-mid text-[14px] mt-4 leading-[1.85]">
+              We audited the homepage of each company on{" "}
+              <strong className="font-medium">
+                {new Date(TYPED_DATASET.generatedAt).toLocaleDateString("en-GB", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })}
+              </strong>{" "}
+              using the same heuristics that power the public{" "}
+              <Link href="/audit" className="text-accent underline-offset-4 hover:underline">
+                /audit
+              </Link>{" "}
+              tool. Financial figures are from Screener.in for the most recent
+              quarter. Scores are computed from twelve weighted detectors
+              outlined in our{" "}
+              <Link href="/signs" className="text-accent underline-offset-4 hover:underline">
+                twelve signs
+              </Link>{" "}
+              diagnostic. Houses are anonymised throughout this report and
+              referred to only by their market-cap rank (House 01 = largest).
+              The largest by market cap returned HTTP 403 to our automated
+              request and could not be scored &mdash; the same behaviour
+              visitors see when sharing the URL on Slack or WhatsApp.
+            </p>
+          </div>
+
+          <div>
+            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-text-faint">
+              Right of reply
+            </span>
+            <p className="text-text-mid text-[14px] mt-4 leading-[1.85]">
+              The Sheenhaus Score is one studio&rsquo;s composite metric, not an
+              industry standard. Any brand named here that disputes a specific
+              measurement is welcome to write to{" "}
+              <a
+                href="mailto:hello@sheenhaus.com"
+                className="text-accent underline-offset-4 hover:underline"
+              >
+                hello@sheenhaus.com
+              </a>{" "}
+              &mdash; we will publish a correction or a clarification within
+              fourteen days.
+            </p>
+          </div>
+
+          <div>
+            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-text-faint">
+              Notice
+            </span>
+            <p className="text-text-faint text-[12px] mt-4 leading-[1.85]">
+              This report is editorial commentary on publicly accessible
+              websites. All company names, brand marks and trademarks remain
+              the property of their respective owners and are used here under
+              nominative fair use for the purpose of comparative analysis. The
+              report does not constitute investment, legal or financial advice.
+              Audit results reflect a single point-in-time measurement on the
+              date noted above; current state may differ.
+            </p>
+          </div>
         </div>
 
         <Link

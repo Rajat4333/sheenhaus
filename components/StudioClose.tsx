@@ -88,6 +88,17 @@ export default function StudioClose() {
             >
               © Sheenhaus {new Date().getFullYear()} · End-to-end tech for ambitious businesses
             </div>
+            {/* Editorial / trademark notice — kept restrained so the
+                hero footer stays elegant. Protects published reports
+                that name third-party brands. */}
+            <div
+              className="text-[9px] tracking-[0.18em] uppercase max-w-md leading-[1.7] mt-1"
+              style={{ color: "var(--cl-ink-faint)", opacity: 0.6 }}
+            >
+              All third-party brand names and trademarks remain the property
+              of their respective owners. Published audits are editorial
+              commentary on public information.
+            </div>
           </div>
         </div>
       </div>

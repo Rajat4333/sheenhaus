@@ -51,7 +51,10 @@ export default function HouseConstellation({ rows }: { rows: Row[] }) {
     // Blocked houses float just below the top edge, separate from scored points
     const y = score !== null ? yForScore(score) : PAD_TOP - 12;
     const radius = rForMcap(r.brand.marketCapCr, minMcap, maxMcap);
-    return { x, y, radius, score, blocked, brand: r.brand };
+    // Anonymised label by market-cap rank. Brand names omitted for legal
+    // restraint — the editorial point is the *category*, not any one house.
+    const rankLabel = `HOUSE ${String(i + 1).padStart(2, "0")}`;
+    return { x, y, radius, score, blocked, brand: r.brand, rankLabel };
   });
 
   // Build a connecting path through only the scored points, in their on-screen order
@@ -177,7 +180,7 @@ export default function HouseConstellation({ rows }: { rows: Row[] }) {
                     fontFamily="var(--font-ibm-plex-mono), monospace"
                     letterSpacing="1"
                   >
-                    BLOCKED
+                    NOT MEASURED
                   </text>
                 </>
               ) : (
@@ -211,7 +214,7 @@ export default function HouseConstellation({ rows }: { rows: Row[] }) {
                   </text>
                 </>
               )}
-              {/* Brand name beneath */}
+              {/* Anonymised house rank beneath */}
               <text
                 x={p.x}
                 y={labelY + 16}
@@ -221,7 +224,7 @@ export default function HouseConstellation({ rows }: { rows: Row[] }) {
                 fontFamily="var(--font-ibm-plex-mono), monospace"
                 letterSpacing="0.5"
               >
-                {abbreviate(p.brand.displayName)}
+                {p.rankLabel}
               </text>
             </g>
           );

@@ -691,6 +691,22 @@ function AuditResultDisplay({ result }: { result: AuditResult }) {
           </>
         )}
       </div>
+
+      {/* Methodology + opinion disclaimer for any displayed audit. */}
+      <div className="mt-16 pt-10 border-t border-border max-w-2xl">
+        <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-text-faint">
+          Notice
+        </span>
+        <p className="text-text-faint text-[12px] mt-4 leading-[1.85]">
+          The Sheenhaus Score is one studio&rsquo;s composite metric, not an
+          industry standard. Results reflect a single point-in-time
+          measurement of the URL you submitted and may differ from later
+          measurements. The audit is editorial commentary on a public
+          webpage; trademarks and brand marks remain the property of their
+          respective owners. Reports are intended for informational use only
+          and do not constitute legal, financial or investment advice.
+        </p>
+      </div>
     </section>
   );
 }

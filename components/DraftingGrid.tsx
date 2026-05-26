@@ -66,7 +66,9 @@ export default function DraftingGrid({
     let dpr = 1;
     let revealStart = performance.now();
     let lastSpawn = performance.now();
-    const mouse = { x: -1e6, y: -1e6, active: false };
+    /* `overContent` mirrors the same content-hit-test used for the
+       coord readout — when true, suppress ALL crosshair drawing too. */
+    const mouse = { x: -1e6, y: -1e6, active: false, overContent: false };
     const lights: CellLight[] = [];
     let rafId = 0;
 
@@ -138,7 +140,7 @@ export default function DraftingGrid({
     };
 
     const drawCrosshair = () => {
-      if (!mouse.active) return;
+      if (!mouse.active || mouse.overContent) return;
 
       ctx.strokeStyle = "rgba(138,106,53,0.32)";
       ctx.lineWidth = 0.8;
@@ -246,17 +248,18 @@ export default function DraftingGrid({
       mouse.x = x;
       mouse.y = y;
 
-      if (coord && mouse.active) {
+      if (mouse.active) {
         const hit = document.elementFromPoint(e.clientX, e.clientY);
-        const overContent = !!hit?.closest(CONTENT_SEL);
-        if (overContent) {
-          coord.style.opacity = "0";
-        } else {
-          coord.style.left = `${x + 14}px`;
-          coord.style.top = `${y + 14}px`;
-          coord.style.opacity = "0.9";
-          coord.textContent = `x ${Math.round(x)} · y ${Math.round(y)}`;
-        }
+        mouse.overContent = !!hit?.closest(CONTENT_SEL);
+      } else {
+        mouse.overContent = false;
+      }
+
+      if (coord && mouse.active && !mouse.overContent) {
+        coord.style.left = `${x + 14}px`;
+        coord.style.top = `${y + 14}px`;
+        coord.style.opacity = "0.9";
+        coord.textContent = `x ${Math.round(x)} · y ${Math.round(y)}`;
       } else if (coord) {
         coord.style.opacity = "0";
       }

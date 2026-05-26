@@ -153,8 +153,7 @@ function ThesisPanel({
       className="absolute inset-0 z-20 flex items-center justify-center px-8 md:px-20"
     >
       <div
-        className="grid w-full max-w-[1300px] gap-12 md:gap-20 items-center"
-        style={{ gridTemplateColumns: "minmax(0,1fr) minmax(0,1fr)" }}
+        className="grid w-full max-w-[1300px] gap-8 md:gap-20 items-center grid-cols-1 md:[grid-template-columns:minmax(0,1fr)_minmax(0,1fr)]"
       >
         {/* Visual */}
         <div
